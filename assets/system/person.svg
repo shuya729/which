@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" viewBox="0 0 600 600">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #607d8b;
+      }
+    </style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 28.7.1, SVG Export Plug-In . SVG Version: 1.2.0 Build 142)  -->
+  <g>
+    <g id="_レイヤー_1" data-name="レイヤー_1">
+      <g id="_レイヤー_1-2" data-name="_レイヤー_1">
+        <g id="svg1">
+          <sodipodi:namedview id="namedview1" bordercolor="#000000" borderopacity="0.25" inkscape:current-layer="layer1" inkscape:cx="349.19473" inkscape:cy="547.25578" inkscape:deskcolor="#d1d1d1" inkscape:document-units="mm" inkscape:pagecheckerboard="0" inkscape:pageopacity="0.0" inkscape:showpageshadow="2" inkscape:window-height="1026" inkscape:window-maximized="0" inkscape:window-width="1680" inkscape:window-x="0" inkscape:window-y="24" inkscape:zoom="0.7245241" pagecolor="#ffffff"/>
+          <path class="cls-1" d="M300,150c-55.2,0-100,44.8-100,100s44.8,100,100,100,100-44.8,100-100-44.8-100-100-100ZM300,325c-41.4,0-75-33.6-75-75s33.6-75,75-75,75,33.6,75,75-33.6,75-75,75Z"/>
+          <path class="cls-1" d="M300,400c-110.5,0-200,89.5-200,200s89.5,200,200,200,200-89.5,200-200-89.5-200-200-200ZM300,775c-96.6,0-175-78.4-175-175s78.4-175,175-175,175,78.4,175,175-78.4,175-175,175Z"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

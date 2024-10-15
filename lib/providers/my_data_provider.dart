@@ -1,16 +1,12 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:which/models/user_data.dart';
+// import 'package:hooks_riverpod/hooks_riverpod.dart';
+// import 'package:which/models/user_data.dart';
+// import 'package:which/providers/user_stream_provider.dart';
 
-final myDataProvider = Provider<UserData>((_) {
-  return UserData(
-    userId: 'uid',
-    authId: 'uid',
-    name: 'name',
-    image: 'https://picsum.photos/200/300',
-    anonymousFlg: false,
-    deletedFlg: false,
-    rejectedFlg: false,
-    creAt: DateTime.now(),
-    updAt: DateTime.now(),
-  );
-});
+// final Provider<UserData?> myDataProvider = Provider<UserData?>((ref) {
+//   final AsyncValue<UserData> myData = ref.watch(userStreamProvider);
+//   return myData.when(
+//     data: (data) => data,
+//     loading: () => null,
+//     error: (_, __) => null,
+//   );
+// });

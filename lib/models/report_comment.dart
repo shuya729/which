@@ -1,18 +1,51 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/material.dart';
 
-part 'report_comment.freezed.dart';
-part 'report_comment.g.dart';
+@immutable
+class ReportComment {
+  const ReportComment({
+    required this.authId,
+    required this.tgtQuestionId,
+    required this.tgtAnswer,
+    required this.tgtCommentId,
+    required this.creAt,
+  });
 
-@freezed
-class ReportComment with _$ReportComment {
-  const factory ReportComment({
-    required String authId,
-    required String tgtQuestionId,
-    required String tgtAnswer,
-    required String tgtCommentId,
-    required DateTime creAt,
-  }) = _ReportComment;
+  final String authId;
+  final String tgtQuestionId;
+  final int tgtAnswer;
+  final String tgtCommentId;
+  final DateTime creAt;
 
-  factory ReportComment.fromJson(Map<String, dynamic> json) =>
-      _$ReportCommentFromJson(json);
+  // toFirestore
+  Map<String, dynamic> toFirestore() {
+    return <String, dynamic>{
+      'authId': authId,
+      'tgtQuestionId': tgtQuestionId,
+      'tgtAnswer': tgtAnswer,
+      'tgtCommentId': tgtCommentId,
+      'creAt': creAt,
+    };
+  }
+
+  // hashCode
+  @override
+  int get hashCode =>
+      authId.hashCode ^
+      tgtQuestionId.hashCode ^
+      tgtAnswer.hashCode ^
+      tgtCommentId.hashCode ^
+      creAt.hashCode;
+
+  // operator ==
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    final ReportComment otherReportComment = other as ReportComment;
+    return authId == otherReportComment.authId &&
+        tgtQuestionId == otherReportComment.tgtQuestionId &&
+        tgtAnswer == otherReportComment.tgtAnswer &&
+        tgtCommentId == otherReportComment.tgtCommentId &&
+        creAt == otherReportComment.creAt;
+  }
 }

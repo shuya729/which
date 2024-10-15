@@ -5,7 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/providers/my_data_provider.dart';
+import 'package:which/services/firestore_service.dart';
+import 'package:which/services/storage_service.dart';
 import 'package:which/utils/screen_base.dart';
 
 class ProfileScreen extends ScreenBase {
@@ -13,78 +14,113 @@ class ProfileScreen extends ScreenBase {
 
   @override
   String get title => 'プロフィール';
+  @override
+  bool? get allowAnonymous => false;
+  static const String absolutePath = '/profile';
+  static const String relativePath = 'profile';
 
-  Future<void> _pickImage(
-      ValueNotifier<Uint8List?> imageData, BuildContext context) async {
-    try {
-      final XFile? pickedImage = await ImagePicker().pickImage(
-        source: ImageSource.gallery,
-        maxHeight: 600,
-        maxWidth: 600,
-      );
-      if (pickedImage == null || context.mounted == false) return;
-      final CroppedFile? croppedImage = await ImageCropper().cropImage(
-        sourcePath: pickedImage.path,
-        maxHeight: 160,
-        maxWidth: 160,
-        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-        compressFormat: ImageCompressFormat.jpg,
-        uiSettings: [
-          AndroidUiSettings(
-            toolbarTitle: '画像を編集',
-            hideBottomControls: true,
-            cropStyle: CropStyle.circle,
+  bool screenValidate(UserData myData) =>
+      myData.name.isEmpty && myData.image.isEmpty;
+
+  bool disabled(ValueNotifier<Uint8List?> imageData, bool sameName) =>
+      imageData.value == null && sameName;
+
+  void afterDialog(BuildContext context) {}
+
+  Future<void> save({
+    required BuildContext context,
+    required UserData myData,
+    required TextEditingController nameController,
+    required ValueNotifier<Uint8List?> imageData,
+  }) async {
+    final StorageService storageService = StorageService();
+    final FirestoreService firestoreService = FirestoreService();
+    final String? name = nameController.text.trim() == myData.name
+        ? null
+        : nameController.text.trim();
+    final Uint8List? image = imageData.value;
+    final String? imageUrl = image == null
+        ? null
+        : await storageService.putIcon(myData.authId, image);
+    await firestoreService.updateProfile(myData, name, imageUrl);
+    imageData.value = null;
+  }
+
+  Future<void> _pickImage({
+    required BuildContext context,
+    required ValueNotifier<Uint8List?> imageData,
+  }) async {
+    final XFile? pickedImage = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 600,
+      maxWidth: 600,
+    );
+    if (pickedImage == null || context.mounted == false) return;
+    final CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: pickedImage.path,
+      maxHeight: 160,
+      maxWidth: 160,
+      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+      compressFormat: ImageCompressFormat.jpg,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: '画像を編集',
+          hideBottomControls: true,
+          cropStyle: CropStyle.circle,
+        ),
+        IOSUiSettings(
+          cropStyle: CropStyle.circle,
+        ),
+        WebUiSettings(
+          context: context,
+          viewwMode: WebViewMode.mode_1,
+          presentStyle: WebPresentStyle.page,
+          translations: const WebTranslations(
+            title: '画像を編集',
+            rotateLeftTooltip: '左に回転',
+            rotateRightTooltip: '右に回転',
+            cancelButton: 'キャンセル',
+            cropButton: '切り取り',
           ),
-          IOSUiSettings(
-            cropStyle: CropStyle.circle,
-          ),
-          WebUiSettings(
-            context: context,
-            viewwMode: WebViewMode.mode_1,
-            presentStyle: WebPresentStyle.page,
-            translations: const WebTranslations(
-              title: '画像を編集',
-              rotateLeftTooltip: '左に回転',
-              rotateRightTooltip: '右に回転',
-              cancelButton: 'キャンセル',
-              cropButton: '切り取り',
-            ),
-          ),
-        ],
-      );
-      if (croppedImage == null) return;
-      final Uint8List imageBytes = await croppedImage.readAsBytes();
-      imageData.value = imageBytes;
-    } catch (e) {
-      print(e);
-    }
+        ),
+      ],
+    );
+    if (croppedImage == null) return;
+    final Uint8List imageBytes = await croppedImage.readAsBytes();
+    imageData.value = imageBytes;
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final UserData myData = ref.watch(myDataProvider);
-
+  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
     final GlobalKey<FormState> formKey = useState(GlobalKey<FormState>()).value;
-    final ValueNotifier<String> name = useState(myData.name);
     final TextEditingController nameController =
         useTextEditingController(text: myData.name);
     final ValueNotifier<Uint8List?> imageData = useState(null);
+    final bool sameName =
+        useValueListenable(nameController).text == myData.name;
+
+    if (screenValidate(myData)) return dispTemp(msg: '不正な画面遷移です。');
 
     return textTemp(
-      childBuilder: (constraints) {
+      builder: (BoxConstraints constraints) {
         return Form(
           key: formKey,
           child: Column(
             children: [
               Center(
                 child: IconButton(
-                  onPressed: () => _pickImage(imageData, context),
+                  onPressed: () => showFutureLoading(
+                    context,
+                    _pickImage(context: context, imageData: imageData),
+                    errorValue: null,
+                    errorMsg: '画像の取得に失敗しました。',
+                  ),
                   icon: CircleAvatar(
                     radius: 36,
                     backgroundColor: Colors.white,
                     foregroundImage: imageData.value == null
                         ? myData.image.isEmpty
-                            ? null
+                            ? const AssetImage('assets/system/person.png')
                             : NetworkImage(myData.image)
                         : MemoryImage(imageData.value!),
                   ),
@@ -113,7 +149,6 @@ class ProfileScreen extends ScreenBase {
                   errorBorder: UnderlineInputBorder(),
                   focusedErrorBorder: UnderlineInputBorder(),
                 ),
-                onChanged: (value) => name.value = value,
                 validator: (value) {
                   value = value?.trim();
                   if (value == null || value.isEmpty) {
@@ -128,12 +163,24 @@ class ProfileScreen extends ScreenBase {
               const SizedBox(height: 50),
               Center(
                 child: ElevatedButton(
-                  onPressed:
-                      imageData.value == null && name.value == myData.name
-                          ? null
-                          : () {
-                              if (formKey.currentState?.validate() ?? false) {}
-                            },
+                  onPressed: disabled(imageData, sameName)
+                      ? null
+                      : () {
+                          if (formKey.currentState?.validate() ?? false) {
+                            showFutureLoading(
+                              context,
+                              save(
+                                context: context,
+                                myData: myData,
+                                nameController: nameController,
+                                imageData: imageData,
+                              ),
+                              errorValue: null,
+                              errorMsg: 'アップロードに失敗しました。',
+                              afterDialog: afterDialog,
+                            );
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.black.withOpacity(0.8),

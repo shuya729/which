@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:which/models/contact.dart';
+import 'package:which/models/user_data.dart';
+import 'package:which/services/firestore_service.dart';
 import 'package:which/utils/screen_base.dart';
 
 class ContactScreen extends ScreenBase {
@@ -10,16 +13,36 @@ class ContactScreen extends ScreenBase {
 
   @override
   String get title => 'お問い合わせ';
+  static const String absolutePath = '/contact';
+  static const String relativePath = 'contact';
+
+  Future<void> _addContact({
+    required UserData myData,
+    required TextEditingController nameController,
+    required TextEditingController emailController,
+    required ValueNotifier<int> subjectValue,
+    required TextEditingController contentController,
+  }) async {
+    final Contact contact = Contact.init(
+      authId: myData.authId,
+      name: nameController.text,
+      email: emailController.text,
+      subject: subjectValue.value,
+      content: contentController.text,
+    );
+    await FirestoreService().addContact(contact);
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
     final GlobalKey<FormState> formKey = useState(GlobalKey<FormState>()).value;
-    final TextEditingController nameController = useTextEditingController();
+    final TextEditingController nameController =
+        useTextEditingController(text: myData.name);
     final TextEditingController emailController = useTextEditingController();
     final TextEditingController contentController = useTextEditingController();
     final ValueNotifier<int> subjectValue = useState(0);
     return textTemp(
-      childBuilder: (constraints) {
+      builder: (BoxConstraints constraints) {
         return Form(
           key: formKey,
           child: Column(
@@ -183,8 +206,27 @@ class ContactScreen extends ScreenBase {
               const SizedBox(height: 50),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (formKey.currentState?.validate() ?? false) {}
+                  onPressed: () async {
+                    if (formKey.currentState?.validate() ?? false) {
+                      await showFutureLoading(
+                        context,
+                        _addContact(
+                          myData: myData,
+                          nameController: nameController,
+                          emailController: emailController,
+                          subjectValue: subjectValue,
+                          contentController: contentController,
+                        ),
+                        errorValue: null,
+                      );
+                      nameController.text = myData.name;
+                      emailController.clear();
+                      contentController.clear();
+                      subjectValue.value = 0;
+                      if (context.mounted) {
+                        showMsgBar(context, 'お問い合わせを受け付けました。');
+                      }
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,

@@ -1,16 +1,16 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'color_set.freezed.dart';
+@immutable
+class ColorSet {
+  const ColorSet({
+    required this.leftColor,
+    required this.rightColor,
+  });
 
-@freezed
-class ColorSet with _$ColorSet {
-  const factory ColorSet({
-    required Color leftColor,
-    required Color rightColor,
-  }) = _ColorSet;
+  final Color leftColor;
+  final Color rightColor;
 
   factory ColorSet.set() {
     final int leftHue = Random().nextInt(360);
@@ -43,5 +43,19 @@ class ColorSet with _$ColorSet {
         rightLightness,
       ).toColor(),
     );
+  }
+
+  // hashCode
+  @override
+  int get hashCode => leftColor.hashCode ^ rightColor.hashCode;
+
+  // operator ==
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    final ColorSet otherColorSet = other as ColorSet;
+    return leftColor == otherColorSet.leftColor &&
+        rightColor == otherColorSet.rightColor;
   }
 }

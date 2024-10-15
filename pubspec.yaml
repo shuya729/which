@@ -37,13 +37,19 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons:
   auto_size_text:
-  freezed_annotation:
   hooks_riverpod:
   flutter_hooks:
   riverpod_annotation:
   go_router:
   image_picker:
-  image_cropper: ^8.0.2
+  image_cropper:
+  firebase_core:
+  firebase_auth:
+  cloud_firestore:
+  firebase_storage:
+  share_plus:
+  google_sign_in:
+  cloud_functions:
 
 dev_dependencies:
   flutter_test:
@@ -55,9 +61,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints:
-  freezed:
-  build_runner:
-  json_serializable:
   riverpod_generator:
   riverpod_lint:
 
@@ -78,6 +81,9 @@ flutter:
   assets:
     - assets/terms/term.json
     - assets/terms/privacy.json
+    - assets/system/google_logo.png
+    - assets/system/apple_logo.png
+    - assets/system/person.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
