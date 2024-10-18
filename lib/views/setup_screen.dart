@@ -24,7 +24,7 @@ class SetupScreen extends ProfileScreen {
       imageData.value == null || sameName;
 
   @override
-  void afterDialog(BuildContext context) {
+  void afterDialog(BuildContext context, _) {
     if (context.mounted) context.go(HomeScreen.absolutePath);
   }
 

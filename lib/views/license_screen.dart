@@ -31,7 +31,7 @@ class LicenseScreen extends ScreenBase {
       () => showFutureLoading<List<String>>(
         context,
         _getPackages(),
-        errorValue: [],
+        errorValue: List<String>.empty(growable: true),
         errorMsg: 'ライセンス情報の取得に失敗しました。',
       ),
     );
@@ -40,7 +40,8 @@ class LicenseScreen extends ScreenBase {
     final List<String> packages = asyncSnapshot.data ?? [];
     return listTemp(
       itemCount: packages.length,
-      itemBuilder: (BoxConstraints constraints, int index) {
+      itemBuilder:
+          (BuildContext context, BoxConstraints constraints, int index) {
         final String package = packages[index];
         return ListTile(
           title: Text(package),
@@ -81,7 +82,7 @@ class LicenceDetailScreen extends ScreenBase {
       () => showFutureLoading<List<List<LicenseParagraph>>>(
         context,
         _getParagraphs(),
-        errorValue: [],
+        errorValue: List<List<LicenseParagraph>>.empty(growable: true),
         errorMsg: 'ライセンス情報の取得に失敗しました.',
       ),
     );
@@ -94,7 +95,7 @@ class LicenceDetailScreen extends ScreenBase {
 
     final List<List<LicenseParagraph>> paragraphs = asyncSnapshot.data ?? [];
     return textTemp(
-      builder: (BoxConstraints constraints) {
+      builder: (BuildContext context, BoxConstraints constraints) {
         return ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

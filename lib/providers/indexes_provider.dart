@@ -1,30 +1,31 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:which/models/indexes.dart';
+import 'package:which/models/circle_indexes.dart';
 import 'package:which/providers/questions_provider.dart';
 
-final indexesProvider = StateNotifierProvider<IndexesNotifier, Indexes>(
+final indexesProvider = StateNotifierProvider<IndexesNotifier, CircleIndexes>(
   (ref) => IndexesNotifier(ref),
 );
 
-class IndexesNotifier extends StateNotifier<Indexes> {
-  IndexesNotifier(this.ref) : super(const Indexes());
+class IndexesNotifier extends StateNotifier<CircleIndexes> {
+  IndexesNotifier(this.ref) : super(const CircleIndexes());
   final StateNotifierProviderRef ref;
 
-  void setBottom(int value) {
-    state = state.copyWith(bottom: value);
-  }
-
-  void addBottom(int value) {
-    state = state.copyWith(bottom: state.bottom + value);
-  }
-
-  Future<void> changeTop(int value) async {
-    value = value % Indexes.limit;
-    if (state.include(value)) {
-      state = state.copyWith(top: value);
-      if (state.length < 20) {
-        await ref.read(questionsProvider.notifier).getQuestions();
-      }
+  Future<void> changePage(int value) async {
+    state = state.changePage(value);
+    if (state.canLoad()) {
+      await ref.read(questionsProvider.notifier).getQuestions(state.bottom);
     }
+  }
+
+  void init() {
+    state = const CircleIndexes();
+  }
+
+  void loading() {
+    state = state.loading();
+  }
+
+  void loaded(int length) {
+    state = state.loaded(length);
   }
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:which/models/indexes.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/utils/screen_base.dart';
+import 'package:which/services/firestore_service.dart';
+import 'package:which/views/created_screen.dart';
 
-class SavedScreen extends ScreenBase {
+class SavedScreen extends CreatedScreen {
   const SavedScreen({super.key});
 
   @override
@@ -15,37 +15,50 @@ class SavedScreen extends ScreenBase {
   static const String absolutePath = '/saved';
   static const String relativePath = 'saved';
 
-  Future<List<Question>> _getSavedQuestions() async {
-    await Future<void>.delayed(const Duration(seconds: 3));
-    return <Question>[];
+  @override
+  Future<List<Question?>> initQuestions(
+    UserData myData,
+    ValueNotifier<List<Question?>> questions,
+    ValueNotifier<Indexes> indexes,
+  ) async {
+    final FirestoreService firestoreService = FirestoreService();
+    final List<Question> saveds = await firestoreService.getSaveds(myData);
+    questions.value = [...saveds];
+    indexes.value = indexes.value.loaded(saveds.length);
+    return saveds;
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
-    final future = useMemoized(
-      () => showFutureLoading<List<Question>>(
-        context,
-        _getSavedQuestions(),
-        errorValue: [],
-        errorMsg: '質問の取得に失敗しました。',
-      ),
-    );
-    final AsyncSnapshot<List<Question>> asyncSnapshot = useFuture(future);
-
-    if (asyncSnapshot.hasData && asyncSnapshot.data!.isEmpty) {
-      return dispTemp(msg: '保存済みの質問はありません。');
+  Future<List<Question?>> getQuestions(
+    UserData myData,
+    ValueNotifier<List<Question?>> questions,
+    ValueNotifier<Indexes> indexes,
+  ) async {
+    indexes.value = indexes.value.loading();
+    final FirestoreService firestoreService = FirestoreService();
+    final List<Question> saveds =
+        await firestoreService.getSaveds(myData, last: questions.value.last);
+    final List<Question?> preQuestions = questions.value;
+    for (Question question in saveds) {
+      if (preQuestions.contains(question)) saveds.remove(question);
     }
+    questions.value = [...preQuestions, ...saveds];
+    indexes.value = indexes.value.loaded(saveds.length);
+    return saveds;
+  }
 
-    final List<Question> questions = asyncSnapshot.data ?? [];
-    return listTemp(
-      itemCount: questions.length,
-      itemBuilder: (BoxConstraints constraints, int index) {
-        final Question question = questions[index];
-        return ListTile(
-          title: Text(question.quest),
-          subtitle: Text('回答1: ${question.answer1} / 回答2: ${question.answer2}'),
-        );
-      },
-    );
+  @override
+  Future<List<Question?>> refreshQuestions(
+    UserData myData,
+    ValueNotifier<List<Question?>> questions,
+    ValueNotifier<Indexes> indexes,
+  ) async {
+    questions.value = [];
+    indexes.value = const Indexes();
+    final FirestoreService firestoreService = FirestoreService();
+    final List<Question> saveds = await firestoreService.getSaveds(myData);
+    questions.value = [...saveds];
+    indexes.value = indexes.value.loaded(saveds.length);
+    return saveds;
   }
 }

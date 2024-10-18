@@ -27,7 +27,7 @@ class SigninScreen extends ScreenBase {
     await context.push(RegistScreen.absolutePath);
   }
 
-  void afterDialog(BuildContext context) async {
+  void afterDialog(BuildContext context, _) async {
     if (context.mounted) context.go(HomeScreen.absolutePath);
   }
 
@@ -82,7 +82,7 @@ class SigninScreen extends ScreenBase {
   @override
   Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
     return textTemp(
-      builder: (BoxConstraints constraints) {
+      builder: (BuildContext context, BoxConstraints constraints) {
         return Column(
           children: [
             const Text('以下の方法でサインインしてください。'),

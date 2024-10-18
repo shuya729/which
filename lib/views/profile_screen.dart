@@ -25,7 +25,7 @@ class ProfileScreen extends ScreenBase {
   bool disabled(ValueNotifier<Uint8List?> imageData, bool sameName) =>
       imageData.value == null && sameName;
 
-  void afterDialog(BuildContext context) {}
+  void afterDialog(BuildContext context, _) {}
 
   Future<void> save({
     required BuildContext context,
@@ -102,7 +102,7 @@ class ProfileScreen extends ScreenBase {
     if (screenValidate(myData)) return dispTemp(msg: '不正な画面遷移です。');
 
     return textTemp(
-      builder: (BoxConstraints constraints) {
+      builder: (BuildContext context, BoxConstraints constraints) {
         return Form(
           key: formKey,
           child: Column(

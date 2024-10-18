@@ -20,7 +20,7 @@ class SignoutScreen extends ScreenBase {
   String get description => 'サインアウトしますか？\n一部の機能が使用できなくなります。';
   String get errorMsg => 'サインアウトに失敗しました。';
 
-  void afterDialog(BuildContext context) {
+  void afterDialog(BuildContext context, _) {
     if (context.mounted) context.go(HomeScreen.absolutePath);
   }
 
@@ -31,7 +31,7 @@ class SignoutScreen extends ScreenBase {
   @override
   Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
     return textTemp(
-      builder: (BoxConstraints constraints) {
+      builder: (BuildContext context, BoxConstraints constraints) {
         return Column(
           children: [
             Text(description),

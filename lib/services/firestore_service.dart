@@ -92,46 +92,50 @@ class FirestoreService {
   }
 
   // 要変更
-  Future<List<Question>> getQuestions(
-    List<Question> questions, {
-    String? id,
-  }) async {
-    Query query;
-    if (questions.isNotEmpty) {
-      query = questionCollection
-          .orderBy('creAt', descending: true)
-          .endBefore([questions.last.creAt]).limit(20);
-    } else {
-      query = questionCollection.orderBy('creAt', descending: true).limit(40);
-    }
-    if (id != null && id.isNotEmpty) {
-      final ref = questionCollection.doc(id);
-      final DocumentSnapshot snapshot = await ref.get();
-      if (snapshot.exists && snapshot.data() is Map<String, dynamic>) {
-        final Map<String, dynamic> data =
-            snapshot.data() as Map<String, dynamic>;
-        questions.add(Question.fromFirestore(data));
-      }
-    }
-    final QuerySnapshot snapshots = await query.get();
-    if (snapshots.docs.isEmpty) return questions;
-    for (final QueryDocumentSnapshot doc in snapshots.docs) {
-      if (doc.exists && doc.data() is Map<String, dynamic>) {
-        final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        final Question question = Question.fromFirestore(data);
-        if (!questions.any((e) => e.questionId == question.questionId)) {
-          questions.add(question);
-        }
-      }
-    }
-    return questions;
-  }
+  // Future<List<Question>> getQuestions(
+  //   List<Question> questions, {
+  //   String? id,
+  // }) async {
+  //   Query query;
+  //   if (questions.isNotEmpty) {
+  //     query = questionCollection
+  //         .orderBy('creAt', descending: true)
+  //         .startAfter([questions.last.creAt]).limit(20);
+  //   } else {
+  //     query = questionCollection.orderBy('creAt', descending: true).limit(40);
+  //   }
+  //   if (id != null && id.isNotEmpty) {
+  //     final ref = questionCollection.doc(id);
+  //     final DocumentSnapshot snapshot = await ref.get();
+  //     if (snapshot.exists && snapshot.data() is Map<String, dynamic>) {
+  //       final Map<String, dynamic> data =
+  //           snapshot.data() as Map<String, dynamic>;
+  //       questions.add(Question.fromFirestore(data));
+  //     }
+  //   }
+  //   final QuerySnapshot snapshots = await query.get();
+  //   if (snapshots.docs.isEmpty) return questions;
+  //   for (final QueryDocumentSnapshot doc in snapshots.docs) {
+  //     if (doc.exists && doc.data() is Map<String, dynamic>) {
+  //       final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  //       final Question question = Question.fromFirestore(data);
+  //       if (!questions.any((e) => e.questionId == question.questionId)) {
+  //         questions.add(question);
+  //       }
+  //     }
+  //   }
+  //   return questions;
+  // }
 
-  Future<List<Question>> _getQuestionsFromIds(List<String> questionIds) async {
+  Future<List<Question>> _getQuestionsFromIds(
+    List<QuestionId> questionIds,
+  ) async {
     final List<Question> questions = [];
     if (questionIds.isEmpty) return questions;
-    final Query query =
-        questionCollection.where('questionId', whereIn: questionIds);
+    final Query query = questionCollection.where(
+      'questionId',
+      whereIn: questionIds.map((q) => q.questionId).toList(),
+    );
     final QuerySnapshot snapshots = await query.get();
     if (snapshots.docs.isEmpty) return questions;
     for (final QueryDocumentSnapshot doc in snapshots.docs) {
@@ -142,10 +146,10 @@ class FirestoreService {
     }
     // // questionIdsの順番に並び替え
     final List<Question> sortedQuestions = [];
-    for (final String questionId in questionIds) {
-      if (questions.any((e) => e.questionId == questionId)) {
+    for (final QuestionId questionId in questionIds) {
+      if (questions.any((e) => e.questionId == questionId.questionId)) {
         final Question question =
-            questions.firstWhere((e) => e.questionId == questionId);
+            questions.firstWhere((e) => e.questionId == questionId.questionId);
         sortedQuestions.add(question);
       }
     }
@@ -158,7 +162,7 @@ class FirestoreService {
       query = questionCollection
           .where('authId', isEqualTo: myData.authId)
           .orderBy('creAt', descending: true)
-          .endBefore([last.creAt]).limit(20);
+          .startAfter([last.creAt]).limit(20);
     } else {
       query = questionCollection
           .where('authId', isEqualTo: myData.authId)
@@ -169,7 +173,9 @@ class FirestoreService {
     if (snapshot.docs.isEmpty) return [];
     final List<Question> questions = [];
     for (final QueryDocumentSnapshot doc in snapshot.docs) {
-      if (doc.exists && doc.data() is Map<String, dynamic>) {
+      if (doc.exists &&
+          doc.id != last?.questionId &&
+          doc.data() is Map<String, dynamic>) {
         final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         questions.add(Question.fromFirestore(data));
       }
@@ -232,19 +238,21 @@ class FirestoreService {
     if (last != null) {
       query = savedCollection(myData)
           .orderBy('creAt', descending: true)
-          .endBefore([last.creAt]).limit(20);
+          .startAfter([last.creAt]).limit(20);
     } else {
       query =
-          savedCollection(myData).orderBy('creAt', descending: true).limit(40);
+          savedCollection(myData).orderBy('creAt', descending: true).limit(30);
     }
     final QuerySnapshot<Object?> snapshot = await query.get();
     if (snapshot.docs.isEmpty) return [];
-    final List<String> questionIds = [];
+    final List<QuestionId> questionIds = [];
     for (final QueryDocumentSnapshot doc in snapshot.docs) {
-      if (doc.exists && doc.data() is Map<String, dynamic>) {
+      if (doc.exists &&
+          doc.id != last?.questionId &&
+          doc.data() is Map<String, dynamic>) {
         final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         final QuestionId questionId = QuestionId.fromFirestore(data);
-        questionIds.add(questionId.questionId);
+        questionIds.add(questionId);
       }
     }
     if (questionIds.isEmpty) return [];

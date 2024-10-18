@@ -32,7 +32,7 @@ class TermScreen extends ScreenBase {
       () => showFutureLoading<List<Terms>>(
         context,
         _getTerms(),
-        errorValue: [],
+        errorValue: List<Terms>.empty(growable: true),
         errorMsg: '利用規約の取得に失敗しました.',
       ),
     );
@@ -40,7 +40,7 @@ class TermScreen extends ScreenBase {
 
     final List<Terms> terms = asyncSnapshot.data ?? [];
     return textTemp(
-      builder: (BoxConstraints constraints) {
+      builder: (BuildContext context, BoxConstraints constraints) {
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

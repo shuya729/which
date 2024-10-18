@@ -21,7 +21,7 @@ class DeleteScreen extends SignoutScreen {
   @override
   String get description => 'アカウントを削除しますか？\n全てのデータが削除されます。';
   @override
-  void afterDialog(BuildContext context) {
+  void afterDialog(BuildContext context, _) {
     if (context.mounted) context.go(HomeScreen.absolutePath);
   }
 

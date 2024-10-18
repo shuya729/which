@@ -70,7 +70,7 @@ class CreateScreen extends ScreenBase {
                       answer2Controller: answer2Controller,
                     ),
                     errorValue: null,
-                    afterDialog: (context) {
+                    afterDialog: (context, _) {
                       if (context.mounted) context.pop();
                     },
                   );

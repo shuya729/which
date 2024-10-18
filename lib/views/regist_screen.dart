@@ -27,7 +27,7 @@ class RegistScreen extends SigninScreen {
   }
 
   @override
-  void afterDialog(BuildContext context) {
+  void afterDialog(BuildContext context, _) {
     if (context.mounted) context.go(SetupScreen.absolutePath);
   }
 
