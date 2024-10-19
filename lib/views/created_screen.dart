@@ -94,12 +94,10 @@ class CreatedScreen extends ScreenBase {
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
-    questions.value = [];
-    indexes.value = const Indexes();
     final FirestoreService firestoreService = FirestoreService();
     final List<Question> createds = await firestoreService.getCreateds(myData);
     questions.value = [...createds];
-    indexes.value = indexes.value.loaded(createds.length);
+    indexes.value = Indexes().loaded(createds.length);
     return createds;
   }
 
@@ -129,6 +127,36 @@ class CreatedScreen extends ScreenBase {
     );
   }
 
+  void _listener(
+    BuildContext context,
+    UserData myData,
+    PageController pageController,
+    ValueNotifier<List<Question?>> questions,
+    ValueNotifier<Indexes> indexes,
+    ValueNotifier<double> diff,
+  ) {
+    if (pageController.hasClients) {
+      final int page = pageController.page?.round() ?? 0;
+      final double position =
+          pageController.position.pixels / MediaQuery.of(context).size.height;
+      if (page == indexes.value.top) {
+        final double diffValue = page - position;
+        if (diffValue > 0.1 && diff.value <= 0.1) {
+          _refresh(context, myData, questions, pageController, indexes, diff);
+        }
+        diff.value = diffValue;
+      } else if (page == indexes.value.bottom) {
+        final diffValue = position - page;
+        if (diffValue > 0.1 && diff.value <= 0.1) {
+          _reload(context, myData, questions, indexes, pageController);
+        }
+        diff.value = diffValue;
+      } else {
+        diff.value = 0;
+      }
+    }
+  }
+
   @override
   Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
     final PageController pageController = usePageController();
@@ -136,31 +164,18 @@ class CreatedScreen extends ScreenBase {
     final ValueNotifier<Indexes> indexes = useState(const Indexes());
     final ValueNotifier<double> diff = useState(0);
     useEffect(() {
-      pageController.addListener(() {
-        if (pageController.hasClients) {
-          final int page = pageController.page?.round() ?? 0;
-          final double position = pageController.position.pixels /
-              MediaQuery.of(context).size.height;
-          if (page == indexes.value.top) {
-            final double diffValue = page - position;
-            if (diffValue > 0.1 && diff.value <= 0.1) {
-              _refresh(
-                  context, myData, questions, pageController, indexes, diff);
-            }
-            diff.value = diffValue;
-          } else if (page == indexes.value.bottom) {
-            final diffValue = position - page;
-            if (diffValue > 0.1 && diff.value <= 0.1) {
-              _reload(context, myData, questions, indexes, pageController);
-            }
-            diff.value = diffValue;
-          } else {
-            diff.value = 0;
-          }
-        }
-      });
-      return null;
-    }, [pageController]);
+      listener() => _listener(
+            context,
+            myData,
+            pageController,
+            questions,
+            indexes,
+            diff,
+          );
+      pageController.addListener(listener);
+      return () => pageController.removeListener(listener);
+    }, [myData, pageController, questions, indexes, diff]);
+
     final future = useMemoized(
       () => showFutureLoading(
         context,
@@ -245,7 +260,6 @@ class CreatedScreen extends ScreenBase {
           ),
         );
       },
-      bottomWidgetBuilder: null,
     );
   }
 }

@@ -53,12 +53,10 @@ class SavedScreen extends CreatedScreen {
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
-    questions.value = [];
-    indexes.value = const Indexes();
     final FirestoreService firestoreService = FirestoreService();
     final List<Question> saveds = await firestoreService.getSaveds(myData);
     questions.value = [...saveds];
-    indexes.value = indexes.value.loaded(saveds.length);
+    indexes.value = Indexes().loaded(saveds.length);
     return saveds;
   }
 }

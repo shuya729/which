@@ -45,15 +45,15 @@ class UserData {
   // fromFirestore
   factory UserData.fromFirestore(Map<String, dynamic> data) {
     return UserData(
-      authId: data['authId'] as String,
-      userId: data['userId'] as String,
-      name: data['name'] as String,
-      image: data['image'] as String,
-      anonymousFlg: data['anonymousFlg'] as bool,
-      deletedFlg: data['deletedFlg'] as bool,
-      rejectedFlg: data['rejectedFlg'] as bool,
-      creAt: (data['creAt'] as Timestamp).toDate(),
-      updAt: (data['updAt'] as Timestamp).toDate(),
+      authId: data['authId'] as String? ?? '',
+      userId: data['userId'] as String? ?? '',
+      name: data['name'] as String? ?? '',
+      image: data['image'] as String? ?? '',
+      anonymousFlg: data['anonymousFlg'] as bool? ?? true,
+      deletedFlg: data['deletedFlg'] as bool? ?? false,
+      rejectedFlg: data['rejectedFlg'] as bool? ?? false,
+      creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updAt: (data['updAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 

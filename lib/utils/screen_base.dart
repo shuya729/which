@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/indexes.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/providers/user_stream_provider.dart';
+import 'package:which/views/create_screen.dart';
 import 'package:which/widgets/loading_widget.dart';
 import 'package:which/widgets/which_widget.dart';
 
@@ -239,8 +241,6 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
     required void Function() reloadFunciton,
     required Widget Function(BuildContext context, BoxConstraints constraints)
         topBuilder,
-    required Widget Function(BuildContext context, BoxConstraints constraints)?
-        bottomWidgetBuilder,
     Widget? drawer,
     Widget? endDrawer,
   }) {
@@ -260,6 +260,9 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
               if (indexes.hasPage(value)) onPageChanged(value);
             },
             itemBuilder: (context, index) {
+              if (!indexes.hasPage(index)) {
+                return _nullWidget(refreshFunction, diff);
+              }
               final int pageIndex = indexes.pageIndex(index);
               final Question? question = questions[pageIndex];
               if (question == null) return _nullWidget(refreshFunction, diff);
@@ -284,7 +287,6 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
                       height: constraints.maxHeight * 0.12,
                       constraints: const BoxConstraints(minHeight: 65),
                       alignment: Alignment.center,
-                      // child: bottomBuilder(context, constraints),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -307,9 +309,28 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
                               foregroundColor: Colors.white.withOpacity(0.8),
                             ),
                           ),
-                          bottomWidgetBuilder == null
-                              ? const SizedBox(height: 50, width: 118)
-                              : bottomWidgetBuilder(context, constraints),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              context.push(CreateScreen.absolutePath);
+                            },
+                            label: const Text('作成'),
+                            icon: const Icon(Icons.add),
+                            style: ElevatedButton.styleFrom(
+                              elevation: 2,
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.black.withOpacity(0.8),
+                              minimumSize: const Size(110, 45),
+                              maximumSize: const Size(240, 50),
+                              fixedSize: Size(
+                                constraints.maxWidth * 0.3,
+                                constraints.maxHeight * 0.07,
+                              ),
+                              textStyle: const TextStyle(fontSize: 18),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
                           IconButton(
                             onPressed: () {
                               if (indexes.current == indexes.bottom) {

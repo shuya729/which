@@ -15,9 +15,9 @@ class Terms {
   // fromJson
   factory Terms.fromJson(Map<String, dynamic> json) {
     return Terms(
-      type: json['type'] as String,
-      text: json['text'] as String,
-      indent: json['indent'] as int,
+      type: json['type'] as String? ?? '',
+      text: json['text'] as String? ?? '',
+      indent: json['indent'] as int? ?? 0,
     );
   }
 

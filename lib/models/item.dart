@@ -17,8 +17,8 @@ class Item {
   // fromFirestore
   factory Item.fromFirestore(Map<String, dynamic> map) {
     return Item(
-      questionId: map['questionId'] as String,
-      authId: map['authId'] as String,
+      questionId: map['questionId'] as String? ?? '',
+      authId: map['authId'] as String? ?? '',
       creAt: (map['creAt'] as DateTime?) ?? DateTime.now(),
       updAt: (map['updAt'] as DateTime?) ?? DateTime.now(),
     );

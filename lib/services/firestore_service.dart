@@ -60,6 +60,7 @@ class FirestoreService {
   Future<void> updateQuestion(
     Question question, {
     bool incrementRead = false,
+    bool incrementWatch = false,
     bool incrementAnswer1 = false,
     bool incrementAnswer2 = false,
   }) {
@@ -67,6 +68,7 @@ class FirestoreService {
     return questionRef(question).update(
       data.toFirestore(
         incrementRead: incrementRead,
+        incrementWatch: incrementWatch,
         incrementAnswer1: incrementAnswer1,
         incrementAnswer2: incrementAnswer2,
       ),
@@ -90,42 +92,6 @@ class FirestoreService {
       }
     }
   }
-
-  // 要変更
-  // Future<List<Question>> getQuestions(
-  //   List<Question> questions, {
-  //   String? id,
-  // }) async {
-  //   Query query;
-  //   if (questions.isNotEmpty) {
-  //     query = questionCollection
-  //         .orderBy('creAt', descending: true)
-  //         .startAfter([questions.last.creAt]).limit(20);
-  //   } else {
-  //     query = questionCollection.orderBy('creAt', descending: true).limit(40);
-  //   }
-  //   if (id != null && id.isNotEmpty) {
-  //     final ref = questionCollection.doc(id);
-  //     final DocumentSnapshot snapshot = await ref.get();
-  //     if (snapshot.exists && snapshot.data() is Map<String, dynamic>) {
-  //       final Map<String, dynamic> data =
-  //           snapshot.data() as Map<String, dynamic>;
-  //       questions.add(Question.fromFirestore(data));
-  //     }
-  //   }
-  //   final QuerySnapshot snapshots = await query.get();
-  //   if (snapshots.docs.isEmpty) return questions;
-  //   for (final QueryDocumentSnapshot doc in snapshots.docs) {
-  //     if (doc.exists && doc.data() is Map<String, dynamic>) {
-  //       final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-  //       final Question question = Question.fromFirestore(data);
-  //       if (!questions.any((e) => e.questionId == question.questionId)) {
-  //         questions.add(question);
-  //       }
-  //     }
-  //   }
-  //   return questions;
-  // }
 
   Future<List<Question>> _getQuestionsFromIds(
     List<QuestionId> questionIds,
@@ -167,7 +133,7 @@ class FirestoreService {
       query = questionCollection
           .where('authId', isEqualTo: myData.authId)
           .orderBy('creAt', descending: true)
-          .limit(40);
+          .limit(30);
     }
     final QuerySnapshot<Object?> snapshot = await query.get();
     if (snapshot.docs.isEmpty) return [];
@@ -196,6 +162,27 @@ class FirestoreService {
   Future<QuestionId?> getReaded(UserData myData, Question question) async {
     final DocumentSnapshot snapshot =
         await readedCollection(myData).doc(question.questionId).get();
+    if (snapshot.exists && snapshot.data() is Map<String, dynamic>) {
+      final Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      return QuestionId.fromFirestore(data);
+    } else {
+      return null;
+    }
+  }
+
+  CollectionReference watchedCollection(UserData myData) =>
+      userRef(myData.authId).collection('watched');
+
+  Future<void> setWatched(UserData myData, Question question) {
+    final DocumentReference doc =
+        watchedCollection(myData).doc(question.questionId);
+    final QuestionId data = QuestionId.init(question.questionId, myData.authId);
+    return doc.set(data.toFirestore(), SetOptions(merge: true));
+  }
+
+  Future<QuestionId?> getWatched(UserData myData, Question question) async {
+    final DocumentSnapshot snapshot =
+        await watchedCollection(myData).doc(question.questionId).get();
     if (snapshot.exists && snapshot.data() is Map<String, dynamic>) {
       final Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
       return QuestionId.fromFirestore(data);

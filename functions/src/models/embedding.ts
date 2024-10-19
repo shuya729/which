@@ -16,7 +16,7 @@ export class Embedding {
    * @param {FirebaseFirestore.DocumentData} data - 初期化に使用するデータ
    */
   constructor(data: FirebaseFirestore.DocumentData) {
-    this.questionId = data.questionId;
+    this.questionId = data.questionId ?? "";
     this.embedding = (data.embedding as VectorValue).toArray();
   }
 

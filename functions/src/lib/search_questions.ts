@@ -4,6 +4,7 @@ import { OpenAI } from "openai";
 import { createEmbedding } from "../utils/create_embedding";
 import { Question } from "../models/question";
 import { Embedding } from "../models/embedding";
+import { sortQuestions } from "../utils/sort_questions";
 
 export const searchQuestions = onCall(
   {
@@ -14,6 +15,10 @@ export const searchQuestions = onCall(
     const authId = request.auth?.uid;
     const input: string = request.data?.input;
     if (!authId || !input || input.length === 0) return [];
+
+    const embeddingRate = 0.72;
+    const latestRate = 0.14;
+    const popularRate = 0.14;
 
     const questions: Question[] = [];
     const embeddings: Embedding[] = [];
@@ -29,7 +34,7 @@ export const searchQuestions = onCall(
     const embeddingsQuery = embeddingsCollection.findNearest({
       vectorField: "embedding",
       queryVector: FieldValue.vector(embedding),
-      limit: 30,
+      limit: 60,
       distanceMeasure: "DOT_PRODUCT",
     });
     const embeddingsSnapshots = await embeddingsQuery.get();
@@ -41,53 +46,33 @@ export const searchQuestions = onCall(
     });
 
     if (embeddingIds.length > 0) {
-      const questionsQuery = questionsCollection
+      const questionsQuery1 = questionsCollection
         .where("questionId", "in", embeddingIds.slice(0, 30))
         .limit(30);
-      const questionsSnapshots = await questionsQuery.get();
-      questionsSnapshots.forEach((doc) => {
+      const questionsSnapshots1 = await questionsQuery1.get();
+      questionsSnapshots1.forEach((doc) => {
         if (doc.exists) questions.push(new Question(doc.data()));
       });
+      if (30 < embeddingIds.length && embeddingIds.length <= 60) {
+        const questionsQuery2 = questionsCollection
+          .where("questionId", "in", embeddingIds.slice(30))
+          .limit(30);
+        const questionsSnapshots2 = await questionsQuery2.get();
+        questionsSnapshots2.forEach((doc) => {
+          if (doc.exists) questions.push(new Question(doc.data()));
+        });
+      }
     }
 
-    // embeddingsがembeddingとのコサイン類似度が高い順にソート
-    const embeddingOrderIds: string[] = [];
-    embeddings.sort((a, b) => {
-      const dotA =
-        a.embedding.reduce((acc, cur, i) => {
-          if (cur === 0) return acc;
-          return acc + cur * embedding[i];
-        }, 0) /
-        Math.sqrt(
-          a.embedding.reduce((acc, cur) => {
-            if (cur === 0) return acc;
-            return acc + cur * cur;
-          }, 0)
-        );
-      const dotB =
-        b.embedding.reduce((acc, cur, i) => {
-          if (cur === 0) return acc;
-          return acc + cur * embedding[i];
-        }, 0) /
-        Math.sqrt(
-          b.embedding.reduce((acc, cur) => {
-            if (cur === 0) return acc;
-            return acc + cur * cur;
-          }, 0)
-        );
-      return dotB - dotA;
-    });
-    embeddings.forEach((embedding) =>
-      embeddingOrderIds.push(embedding.questionId)
+    const sortedQuestions: Question[] = sortQuestions(
+      embedding,
+      embeddings,
+      questions,
+      embeddingRate,
+      latestRate,
+      popularRate
     );
 
-    // questionsがembeddingOrderIdsの順に並び替え
-    questions.sort((a, b) => {
-      const aIndex = embeddingOrderIds.indexOf(a.questionId);
-      const bIndex = embeddingOrderIds.indexOf(b.questionId);
-      return aIndex - bIndex;
-    });
-
-    return questions;
+    return sortedQuestions.slice(0, 40);
   }
 );

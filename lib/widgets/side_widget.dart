@@ -43,18 +43,19 @@ class SideWidget extends HookConsumerWidget {
                   height: constraints.maxHeight * 0.22,
                   alignment: Alignment.center,
                   child: Container(
-                    width: constraints.maxWidth * 0.7,
+                    width: constraints.maxWidth * 0.85,
                     alignment: Alignment.center,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
                     padding: const EdgeInsets.all(10),
                     child: Container(
                       padding: const EdgeInsets.all(10),
-                      constraints: const BoxConstraints(maxWidth: 780),
+                      constraints: const BoxConstraints(maxWidth: 600),
                       child: AutoSizeText(
                         isLeft ? question.answer2 : question.answer1,
                         minFontSize: 10,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 38,
+                          fontSize: 26,
                         ),
                       ),
                     ),

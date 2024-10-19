@@ -13,13 +13,11 @@ class CenterWidget extends HookConsumerWidget {
     required this.question,
     required this.colorSet,
     required this.pageController,
-    required this.voted,
   });
   final UserData myData;
   final Question question;
   final ColorSet colorSet;
   final PageController pageController;
-  final bool voted;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -82,13 +80,13 @@ class CenterWidget extends HookConsumerWidget {
                         ),
                         child: Container(
                           padding: const EdgeInsets.all(10),
-                          constraints: const BoxConstraints(maxWidth: 780),
+                          constraints: const BoxConstraints(maxWidth: 600),
                           child: AutoSizeText(
                             question.answer1,
                             minFontSize: 10,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 38,
+                              fontSize: 26,
                             ),
                           ),
                         ),
@@ -115,25 +113,6 @@ class CenterWidget extends HookConsumerWidget {
                             foregroundColor: Colors.white.withOpacity(0.8),
                           ),
                         ),
-                        !voted
-                            ? const SizedBox.shrink()
-                            : Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  '回答済み',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              ),
                         IconButton(
                           onPressed: () => pageController.nextPage(
                             duration: const Duration(milliseconds: 300),
@@ -164,13 +143,13 @@ class CenterWidget extends HookConsumerWidget {
                         ),
                         child: Container(
                           padding: const EdgeInsets.all(10),
-                          constraints: const BoxConstraints(maxWidth: 780),
+                          constraints: const BoxConstraints(maxWidth: 600),
                           child: AutoSizeText(
                             question.answer2,
                             minFontSize: 10,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 38,
+                              fontSize: 26,
                             ),
                           ),
                         ),

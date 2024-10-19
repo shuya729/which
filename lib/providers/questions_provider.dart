@@ -37,7 +37,6 @@ class QuestionsNotifier extends StateNotifier<List<Question?>> {
 
   Future<List<Question?>> searchQuestions({required String input}) async {
     if (input.isEmpty) return [];
-    state = List<Question?>.filled(CircleIndexes.limit, null);
     ref.read(indexesProvider.notifier).init();
     final List<Question> questions =
         await _functionService.searchQuestions(input: input);
@@ -47,7 +46,6 @@ class QuestionsNotifier extends StateNotifier<List<Question?>> {
   }
 
   Future<List<Question?>> refreshQuestions() async {
-    state = List<Question?>.filled(CircleIndexes.limit, null);
     ref.read(indexesProvider.notifier).init();
     final List<Question> questions = await _functionService.initQuestions();
     state = [...questions]..length = CircleIndexes.limit;

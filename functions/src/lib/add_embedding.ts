@@ -2,7 +2,7 @@ import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { Question } from "../models/question";
 import { OpenAI } from "openai";
 import { createEmbedding } from "../utils/create_embedding";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { Embedding } from "../models/embedding";
 
 export const addEmbedding = onDocumentCreated(
@@ -28,7 +28,7 @@ export const addEmbedding = onDocumentCreated(
     const embeddingRef = db.collection("embeddings").doc(question.questionId);
     const embeddingData = new Embedding({
       questionId: question.questionId,
-      embedding,
+      embedding: FieldValue.vector(embedding),
     });
     const ret = await embeddingRef.set(embeddingData.toFirestore(), {
       merge: true,

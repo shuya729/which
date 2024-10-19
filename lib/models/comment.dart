@@ -32,17 +32,17 @@ class Comment {
   // fromFirestore
   factory Comment.fromFirestore(Map<String, dynamic> data) {
     return Comment(
-      commentId: data['commentId'] as String,
-      tgtQuestionId: data['tgtQuestionId'] as String,
-      tgtAnswer: data['tgtAnswer'] as int,
-      authId: data['authId'] as String,
-      comment: data['comment'] as String,
-      likeCount: data['likeCount'] as int,
-      editedFlg: data['editedFlg'] as bool,
-      deletedFlg: data['deletedFlg'] as bool,
-      rejectedFlg: data['rejectedFlg'] as bool,
-      creAt: (data['creAt'] as Timestamp).toDate(),
-      updAt: (data['updAt'] as Timestamp).toDate(),
+      commentId: data['commentId'] as String? ?? '',
+      tgtQuestionId: data['tgtQuestionId'] as String? ?? '',
+      tgtAnswer: data['tgtAnswer'] as int? ?? 0,
+      authId: data['authId'] as String? ?? '',
+      comment: data['comment'] as String? ?? '',
+      likeCount: data['likeCount'] as int? ?? 0,
+      editedFlg: data['editedFlg'] as bool? ?? false,
+      deletedFlg: data['deletedFlg'] as bool? ?? false,
+      rejectedFlg: data['rejectedFlg'] as bool? ?? false,
+      creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updAt: (data['updAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 

@@ -22,6 +22,9 @@ export class Question {
   /** 読まれた回数 */
   readonly readCount: number;
 
+  /** 閲覧された回数 */
+  readonly watchCount: number;
+
   /** 回答1の回数 */
   readonly answer1Count: number;
 
@@ -51,20 +54,21 @@ export class Question {
    * @param {FirebaseFirestore.DocumentData} data - 初期化に使用するデータ
    */
   constructor(data: FirebaseFirestore.DocumentData) {
-    this.questionId = data.questionId;
-    this.authId = data.authId;
-    this.quest = data.quest;
-    this.answer1 = data.answer1;
-    this.answer2 = data.answer2;
-    this.readCount = data.readCount;
-    this.answer1Count = data.answer1Count;
-    this.answer2Count = data.answer2Count;
-    this.editedFlg = data.editedFlg;
-    this.hiddenFlg = data.hiddenFlg;
-    this.deletedFlg = data.deletedFlg;
-    this.rejectedFlg = data.rejectedFlg;
-    this.creAt = data.creAt;
-    this.updAt = data.updAt;
+    this.questionId = data.questionId ?? "";
+    this.authId = data.authId ?? "";
+    this.quest = data.quest ?? "";
+    this.answer1 = data.answer1 ?? "";
+    this.answer2 = data.answer2 ?? "";
+    this.readCount = data.readCount ?? 0;
+    this.watchCount = data.watchCount ?? 0;
+    this.answer1Count = data.answer1Count ?? 0;
+    this.answer2Count = data.answer2Count ?? 0;
+    this.editedFlg = data.editedFlg ?? false;
+    this.hiddenFlg = data.hiddenFlg ?? false;
+    this.deletedFlg = data.deletedFlg ?? false;
+    this.rejectedFlg = data.rejectedFlg ?? false;
+    this.creAt = data.creAt ?? Timestamp.now();
+    this.updAt = data.updAt ?? Timestamp.now();
   }
 
   /**
@@ -72,6 +76,6 @@ export class Question {
    * @return {number} 人気度
    */
   get getPopularRate(): number {
-    return (this.answer1Count + this.answer2Count) / this.readCount;
+    return this.watchCount / this.readCount;
   }
 }

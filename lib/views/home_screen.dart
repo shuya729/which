@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/circle_indexes.dart';
 import 'package:which/models/question.dart';
@@ -11,7 +10,6 @@ import 'package:which/providers/indexes_provider.dart';
 import 'package:which/providers/questions_provider.dart';
 import 'package:which/providers/user_stream_provider.dart';
 import 'package:which/utils/screen_base.dart';
-import 'package:which/views/create_screen.dart';
 import 'package:which/widgets/drawer_widget.dart';
 import 'package:which/widgets/end_drawer_widget.dart';
 
@@ -43,7 +41,6 @@ class HomeScreen extends ScreenBase {
     PageController pageController,
   ) async {
     if (value.isEmpty) return;
-    pageController.jumpToPage(0);
     await showFutureLoading(
       context,
       questionsNotifier.searchQuestions(input: value),
@@ -52,6 +49,8 @@ class HomeScreen extends ScreenBase {
       afterDialog: (context, ret) {
         if (ret.isEmpty) {
           showMsgBar(context, '質問が見つかりませんでした。');
+        } else {
+          pageController.jumpToPage(0);
         }
       },
     );
@@ -117,7 +116,7 @@ class HomeScreen extends ScreenBase {
           return dispTemp(msg: 'ログインが必要です。');
         } else {
           final future =
-              useMemoized(() => questionsNotifier.initQuestions(id: id));
+              useMemoized(() => questionsNotifier.initQuestions(id: id), [id]);
           final AsyncSnapshot<void> asyncFuture = useFuture(future);
           if (asyncFuture.hasError) {
             return dispTemp(msg: 'データの取得に失敗しました。');
@@ -133,6 +132,46 @@ class HomeScreen extends ScreenBase {
     );
   }
 
+  void _listener(
+    BuildContext context,
+    PageController pageController,
+    TextEditingController textController,
+    QuestionsNotifier questionsNotifier,
+    CircleIndexes indexes,
+    ValueNotifier<double> diff,
+  ) {
+    if (pageController.hasClients) {
+      final int page = pageController.page?.round() ?? 0;
+      final double position =
+          pageController.position.pixels / MediaQuery.of(context).size.height;
+      if (page == indexes.top) {
+        final double diffValue = page - position;
+        if (diffValue > 0.1 && diff.value <= 0.1) {
+          _refreshQuestions(
+            context,
+            questionsNotifier,
+            pageController,
+            textController,
+            diff,
+          );
+        }
+        diff.value = diffValue;
+      } else if (page == indexes.bottom) {
+        final diffValue = position - page;
+        if (diffValue > 0.1 && diff.value <= 0.1) {
+          _reloadQuestions(
+            context,
+            questionsNotifier,
+            pageController,
+          );
+        }
+        diff.value = diffValue;
+      } else {
+        diff.value = 0;
+      }
+    }
+  }
+
   @override
   Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
     final PageController pageController = usePageController();
@@ -143,41 +182,19 @@ class HomeScreen extends ScreenBase {
     final IndexesNotifier indexesNotifier = ref.read(indexesProvider.notifier);
     final CircleIndexes indexes = ref.watch(indexesProvider);
     final ValueNotifier<double> diff = useState(0);
+
     useEffect(() {
-      pageController.addListener(() {
-        if (pageController.hasClients) {
-          final int page = pageController.page?.round() ?? 0;
-          final double position = pageController.position.pixels /
-              MediaQuery.of(context).size.height;
-          if (page == indexes.top) {
-            final double diffValue = page - position;
-            if (diffValue > 0.1 && diff.value <= 0.1) {
-              _refreshQuestions(
-                context,
-                questionsNotifier,
-                pageController,
-                textController,
-                diff,
-              );
-            }
-            diff.value = diffValue;
-          } else if (page == indexes.bottom) {
-            final diffValue = position - page;
-            if (diffValue > 0.1 && diff.value <= 0.1) {
-              _reloadQuestions(
-                context,
-                questionsNotifier,
-                pageController,
-              );
-            }
-            diff.value = diffValue;
-          } else {
-            diff.value = 0;
-          }
-        }
-      });
-      return null;
-    }, [pageController]);
+      listener() => _listener(
+            context,
+            pageController,
+            textController,
+            questionsNotifier,
+            indexes,
+            diff,
+          );
+      pageController.addListener(listener);
+      return () => pageController.removeListener(listener);
+    }, [pageController, textController, questionsNotifier, indexes, diff]);
 
     return questionsTemp(
       myData: myData,
@@ -277,30 +294,6 @@ class HomeScreen extends ScreenBase {
                 ),
               ),
             ],
-          ),
-        );
-      },
-      bottomWidgetBuilder: (BuildContext context, BoxConstraints constraints) {
-        return ElevatedButton.icon(
-          onPressed: () {
-            context.push(CreateScreen.absolutePath);
-          },
-          label: const Text('作成'),
-          icon: const Icon(Icons.add),
-          style: ElevatedButton.styleFrom(
-            elevation: 2,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.black.withOpacity(0.8),
-            minimumSize: const Size(110, 45),
-            maximumSize: const Size(240, 50),
-            fixedSize: Size(
-              constraints.maxWidth * 0.3,
-              constraints.maxHeight * 0.07,
-            ),
-            textStyle: const TextStyle(fontSize: 18),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
           ),
         );
       },

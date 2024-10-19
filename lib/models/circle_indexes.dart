@@ -4,7 +4,7 @@ import 'package:which/models/indexes.dart';
 @immutable
 class CircleIndexes extends Indexes {
   static const int limit = 80;
-  static const int loadCount = Indexes.loadCount;
+  static const int loadCount = 20;
   final int multiplier;
 
   const CircleIndexes({
@@ -30,17 +30,10 @@ class CircleIndexes extends Indexes {
     int? multiplier,
   }) {
     if (bottom != null) {
-      if (this.top <= this.bottom) {
-        final int preTop = this.top + limit;
-        if (this.bottom < preTop && preTop <= bottom) {
-          top = bottom + 1;
-        }
-      } else {
-        if (this.bottom < this.top && this.top <= bottom) {
-          top = bottom + 1;
-        }
-      }
+      top = _calcTop(this.top, this.bottom, bottom);
     }
+    print(
+        'top: ${(top ?? this.top) % limit}, current: ${(current ?? this.current) % limit}, bottom: ${(bottom ?? this.bottom) % limit}, load: ${(load ?? this.load) % limit}, multiplier: $multiplier');
     return CircleIndexes(
       top: top ?? this.top,
       current: current ?? this.current,
@@ -52,13 +45,13 @@ class CircleIndexes extends Indexes {
 
   @override
   CircleIndexes changePage(int value) {
-    print('top: $top, current: $value, bottom: $bottom, load: $load');
     return copyWith(current: value, multiplier: value ~/ limit);
   }
 
   @override
   CircleIndexes loading() {
-    return copyWith(load: bottom);
+    final int? top = _calcTop(this.top, bottom, bottom + loadCount);
+    return copyWith(top: top, load: bottom);
   }
 
   @override
@@ -91,5 +84,19 @@ class CircleIndexes extends Indexes {
   @override
   int pageIndex(int page) {
     return page % limit;
+  }
+
+  int? _calcTop(int top, int bottom, int bottomValue) {
+    if (top <= bottom) {
+      final int preTop = top + limit;
+      if (bottom < preTop && preTop <= bottomValue) {
+        return bottomValue + 1;
+      }
+    } else {
+      if (bottom < top && top <= bottomValue) {
+        return bottomValue + 1;
+      }
+    }
+    return null;
   }
 }

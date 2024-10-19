@@ -10,9 +10,9 @@ class Question {
     required this.answer1,
     required this.answer2,
     required this.readCount,
+    required this.watchCount,
     required this.answer1Count,
     required this.answer2Count,
-    // required this.vector,
     required this.editedFlg,
     required this.hiddenFlg,
     required this.deletedFlg,
@@ -27,9 +27,9 @@ class Question {
   final String answer1;
   final String answer2;
   final int readCount;
+  final int watchCount;
   final int answer1Count;
   final int answer2Count;
-  // final List<double> vector;
   final bool editedFlg;
   final bool hiddenFlg;
   final bool deletedFlg;
@@ -50,9 +50,9 @@ class Question {
       answer1: answer1,
       answer2: answer2,
       readCount: 0,
+      watchCount: 0,
       answer1Count: 0,
       answer2Count: 0,
-      // vector: const [],
       editedFlg: false,
       hiddenFlg: false,
       deletedFlg: false,
@@ -65,23 +65,24 @@ class Question {
   // fromMap(fromJson)
   factory Question.fromMap(Map<String, dynamic> data) {
     return Question(
-      questionId: data['questionId'] as String,
-      authId: data['authId'] as String,
-      quest: data['quest'] as String,
-      answer1: data['answer1'] as String,
-      answer2: data['answer2'] as String,
-      readCount: data['readCount'] as int,
-      answer1Count: data['answer1Count'] as int,
-      answer2Count: data['answer2Count'] as int,
-      editedFlg: data['editedFlg'] as bool,
-      hiddenFlg: data['hiddenFlg'] as bool,
-      deletedFlg: data['deletedFlg'] as bool,
-      rejectedFlg: data['rejectedFlg'] as bool,
+      questionId: data['questionId'] as String? ?? '',
+      authId: data['authId'] as String? ?? '',
+      quest: data['quest'] as String? ?? '',
+      answer1: data['answer1'] as String? ?? '',
+      answer2: data['answer2'] as String? ?? '',
+      readCount: data['readCount'] as int? ?? 0,
+      watchCount: data['watchCount'] as int? ?? 0,
+      answer1Count: data['answer1Count'] as int? ?? 0,
+      answer2Count: data['answer2Count'] as int? ?? 0,
+      editedFlg: data['editedFlg'] as bool? ?? false,
+      hiddenFlg: data['hiddenFlg'] as bool? ?? false,
+      deletedFlg: data['deletedFlg'] as bool? ?? false,
+      rejectedFlg: data['rejectedFlg'] as bool? ?? false,
       creAt: DateTime.fromMillisecondsSinceEpoch(
-        ((data['creAt'] as Map)['_seconds']) * 1000,
+        ((data['creAt'] as Map?)?['_seconds'] as int?) ?? 0 * 1000,
       ),
       updAt: DateTime.fromMillisecondsSinceEpoch(
-        ((data['updAt'] as Map)['_seconds']) * 1000,
+        ((data['updAt'] as Map?)?['_seconds'] as int?) ?? 0 * 1000,
       ),
     );
   }
@@ -89,27 +90,28 @@ class Question {
   // fromFirestore
   factory Question.fromFirestore(Map<String, dynamic> data) {
     return Question(
-      questionId: data['questionId'] as String,
-      authId: data['authId'] as String,
-      quest: data['quest'] as String,
-      answer1: data['answer1'] as String,
-      answer2: data['answer2'] as String,
-      readCount: data['readCount'] as int,
-      answer1Count: data['answer1Count'] as int,
-      answer2Count: data['answer2Count'] as int,
-      // vector: (data['vector'] as List).map((e) => e as double).toList(),
-      editedFlg: data['editedFlg'] as bool,
-      hiddenFlg: data['hiddenFlg'] as bool,
-      deletedFlg: data['deletedFlg'] as bool,
-      rejectedFlg: data['rejectedFlg'] as bool,
-      creAt: (data['creAt'] as Timestamp).toDate(),
-      updAt: (data['updAt'] as Timestamp).toDate(),
+      questionId: data['questionId'] as String? ?? '',
+      authId: data['authId'] as String? ?? '',
+      quest: data['quest'] as String? ?? '',
+      answer1: data['answer1'] as String? ?? '',
+      answer2: data['answer2'] as String? ?? '',
+      readCount: data['readCount'] as int? ?? 0,
+      watchCount: data['watchCount'] as int? ?? 0,
+      answer1Count: data['answer1Count'] as int? ?? 0,
+      answer2Count: data['answer2Count'] as int? ?? 0,
+      editedFlg: data['editedFlg'] as bool? ?? false,
+      hiddenFlg: data['hiddenFlg'] as bool? ?? false,
+      deletedFlg: data['deletedFlg'] as bool? ?? false,
+      rejectedFlg: data['rejectedFlg'] as bool? ?? false,
+      creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updAt: (data['updAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
   // toFirestore
   Map<String, dynamic> toFirestore({
     bool incrementRead = false,
+    bool incrementWatch = false,
     bool incrementAnswer1 = false,
     bool incrementAnswer2 = false,
   }) {
@@ -120,9 +122,9 @@ class Question {
       'answer1': answer1,
       'answer2': answer2,
       'readCount': incrementRead ? FieldValue.increment(1) : readCount,
+      'watchCount': incrementWatch ? FieldValue.increment(1) : watchCount,
       'answer1Count': incrementAnswer1 ? FieldValue.increment(1) : answer1Count,
       'answer2Count': incrementAnswer2 ? FieldValue.increment(1) : answer2Count,
-      // 'vector': vector,
       'editedFlg': editedFlg,
       'hiddenFlg': hiddenFlg,
       'deletedFlg': deletedFlg,
@@ -140,9 +142,9 @@ class Question {
     String? answer1,
     String? answer2,
     int? readCount,
+    int? watchCount,
     int? answer1Count,
     int? answer2Count,
-    // List<double>? vector,
     bool? editedFlg,
     bool? hiddenFlg,
     bool? deletedFlg,
@@ -157,9 +159,9 @@ class Question {
       answer1: answer1 ?? this.answer1,
       answer2: answer2 ?? this.answer2,
       readCount: readCount ?? this.readCount,
+      watchCount: watchCount ?? this.watchCount,
       answer1Count: answer1Count ?? this.answer1Count,
       answer2Count: answer2Count ?? this.answer2Count,
-      // vector: vector ?? this.vector,
       editedFlg: editedFlg ?? this.editedFlg,
       hiddenFlg: hiddenFlg ?? this.hiddenFlg,
       deletedFlg: deletedFlg ?? this.deletedFlg,
@@ -178,9 +180,9 @@ class Question {
       answer1.hashCode ^
       answer2.hashCode ^
       readCount.hashCode ^
+      watchCount.hashCode ^
       answer1Count.hashCode ^
       answer2Count.hashCode ^
-      // vector.hashCode ^
       editedFlg.hashCode ^
       hiddenFlg.hashCode ^
       deletedFlg.hashCode ^
@@ -200,9 +202,9 @@ class Question {
         answer1 == otherQuestion.answer1 &&
         answer2 == otherQuestion.answer2 &&
         readCount == otherQuestion.readCount &&
+        watchCount == otherQuestion.watchCount &&
         answer1Count == otherQuestion.answer1Count &&
         answer2Count == otherQuestion.answer2Count &&
-        // vector == otherQuestion.vector &&
         editedFlg == otherQuestion.editedFlg &&
         hiddenFlg == otherQuestion.hiddenFlg &&
         deletedFlg == otherQuestion.deletedFlg &&

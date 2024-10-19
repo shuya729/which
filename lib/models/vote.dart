@@ -30,10 +30,10 @@ class Vote {
 
   factory Vote.fromFirestore(Map<String, dynamic> data) {
     return Vote(
-      questionId: data['questionId'] as String,
-      authId: data['authId'] as String,
-      vote: data['vote'] as int,
-      creAt: (data['creAt'] as Timestamp).toDate(),
+      questionId: data['questionId'] as String? ?? '',
+      authId: data['authId'] as String? ?? '',
+      vote: data['vote'] as int? ?? 0,
+      creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 

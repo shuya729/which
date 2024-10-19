@@ -3,7 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/services/firestore_service.dart';
-import 'package:which/services/function_service.dart';
 import 'package:which/utils/screen_base.dart';
 
 class BottomSheetWidget extends HookConsumerWidget with ScreenBaseFunction {
@@ -39,13 +38,7 @@ class BottomSheetWidget extends HookConsumerWidget with ScreenBaseFunction {
 
   Future<void> _test(BuildContext context) async {
     Navigator.of(context).pop();
-    try {
-      print('\nstart');
-      FunctionService functionService = FunctionService();
-      final ret = await functionService.searchQuestions(input: '季節');
-      print(ret.length);
-      print(ret.first.quest);
-    } catch (e) {
+    try {} catch (e) {
       print(e);
     }
   }

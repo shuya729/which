@@ -41,10 +41,10 @@ class QuestionId {
   // fromFireatore
   factory QuestionId.fromFirestore(Map<String, dynamic> data) {
     return QuestionId(
-      questionId: data['questionId'] as String,
-      authId: data['authId'] as String,
-      creAt: (data['creAt'] as Timestamp).toDate(),
-      updAt: (data['updAt'] as Timestamp).toDate(),
+      questionId: data['questionId'] as String? ?? '',
+      authId: data['authId'] as String? ?? '',
+      creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updAt: (data['updAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 

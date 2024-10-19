@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
@@ -32,9 +29,6 @@ class MyApp extends HookConsumerWidget {
     return MaterialApp.router(
       title: 'Which',
       theme: ThemeData(
-        typography: !kIsWeb && Platform.isIOS
-            ? Typography.material2021(platform: TargetPlatform.iOS)
-            : null,
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: Colors.blueGrey,
           accentColor: Colors.blueGrey.shade800,

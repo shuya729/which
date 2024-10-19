@@ -16,9 +16,9 @@ class UserId {
   // fromFirestore
   factory UserId.fromFirestore(Map<String, dynamic> data) {
     return UserId(
-      userId: data['userId'] as String,
-      authId: data['authId'] as String,
-      creAt: (data['creAt'] as Timestamp).toDate(),
+      userId: data['userId'] as String? ?? '',
+      authId: data['authId'] as String? ?? '',
+      creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 

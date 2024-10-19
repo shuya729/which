@@ -19,7 +19,7 @@ class CreateScreen extends ScreenBase {
   static const String absolutePath = '/create';
   static const String relativePath = 'create';
 
-  Future<void> _post({
+  Future<Question?> _post({
     required BuildContext context,
     required UserData myData,
     required GlobalKey<FormState> formKey,
@@ -37,6 +37,7 @@ class CreateScreen extends ScreenBase {
       answer2: answer2Value,
     );
     await FirestoreService().addQuestion(question);
+    return question;
   }
 
   @override
@@ -70,8 +71,8 @@ class CreateScreen extends ScreenBase {
                       answer2Controller: answer2Controller,
                     ),
                     errorValue: null,
-                    afterDialog: (context, _) {
-                      if (context.mounted) context.pop();
+                    afterDialog: (context, ret) {
+                      if (ret != null && context.mounted) context.pop();
                     },
                   );
                 }
@@ -112,7 +113,7 @@ class CreateScreen extends ScreenBase {
                         TextFormField(
                           controller: questController,
                           autofocus: true,
-                          maxLength: 140,
+                          maxLength: 80,
                           minLines: constraints.maxWidth > 500 ? 3 : 4,
                           maxLines: 6,
                           keyboardType: TextInputType.multiline,
@@ -133,15 +134,15 @@ class CreateScreen extends ScreenBase {
                             ),
                           ),
                           inputFormatters: [
-                            LengthLimitingTextInputFormatter(140),
+                            LengthLimitingTextInputFormatter(80),
                             FilteringTextInputFormatter.deny(RegExp(r'\n')),
                           ],
                           validator: (value) {
                             value = value?.trim();
                             if (value == null || value.isEmpty) {
                               return '質問を入力してください。';
-                            } else if (value.length > 140) {
-                              return '質問は140文字以内で入力してください。';
+                            } else if (value.length > 80) {
+                              return '質問は80文字以内で入力してください。';
                             } else if (value.contains('\n')) {
                               return '改行は入力できません。';
                             } else {
@@ -152,7 +153,7 @@ class CreateScreen extends ScreenBase {
                         SizedBox(height: max(20, constraints.maxHeight * 0.04)),
                         TextFormField(
                           controller: answer1Controller,
-                          maxLength: 140,
+                          maxLength: 60,
                           minLines: 2,
                           maxLines: 6,
                           keyboardType: TextInputType.multiline,
@@ -185,15 +186,15 @@ class CreateScreen extends ScreenBase {
                             ),
                           ),
                           inputFormatters: [
-                            LengthLimitingTextInputFormatter(140),
+                            LengthLimitingTextInputFormatter(60),
                             FilteringTextInputFormatter.deny(RegExp(r'\n')),
                           ],
                           validator: (value) {
                             value = value?.trim();
                             if (value == null || value.isEmpty) {
                               return '選択肢1を入力してください。';
-                            } else if (value.length > 140) {
-                              return '140文字以内で入力してください。';
+                            } else if (value.length > 60) {
+                              return '60文字以内で入力してください。';
                             } else if (value.contains('\n')) {
                               return '改行は入力できません。';
                             } else {
@@ -204,7 +205,7 @@ class CreateScreen extends ScreenBase {
                         SizedBox(height: max(10, constraints.maxHeight * 0.02)),
                         TextFormField(
                           controller: answer2Controller,
-                          maxLength: 140,
+                          maxLength: 60,
                           minLines: 2,
                           maxLines: 6,
                           keyboardType: TextInputType.multiline,
@@ -237,15 +238,15 @@ class CreateScreen extends ScreenBase {
                             ),
                           ),
                           inputFormatters: [
-                            LengthLimitingTextInputFormatter(140),
+                            LengthLimitingTextInputFormatter(60),
                             FilteringTextInputFormatter.deny(RegExp(r'\n')),
                           ],
                           validator: (value) {
                             value = value?.trim();
                             if (value == null || value.isEmpty) {
                               return '選択肢2を入力してください。';
-                            } else if (value.length > 140) {
-                              return '140文字以内で入力してください。';
+                            } else if (value.length > 60) {
+                              return '60文字以内で入力してください。';
                             } else if (value.contains('\n')) {
                               return '改行は入力できません。';
                             } else if (value == answer1Controller.text) {
