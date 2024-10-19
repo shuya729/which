@@ -52,7 +52,7 @@ class CreateScreen extends ScreenBase {
         iconTheme: const IconThemeData(size: 18),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
         ),
         actions: [
           Padding(
@@ -117,12 +117,20 @@ class CreateScreen extends ScreenBase {
                           minLines: constraints.maxWidth > 500 ? 3 : 4,
                           maxLines: 6,
                           keyboardType: TextInputType.multiline,
-                          cursorHeight: 16,
-                          cursorColor: Colors.black87,
-                          style: const TextStyle(fontSize: 14, height: 1.4),
-                          decoration: const InputDecoration(
+                          // cursorHeight: 16,
+                          cursorHeight: 18,
+                          cursorColor: Colors.grey.shade800,
+                          // style: const TextStyle(fontSize: 14, height: 1.4),
+                          style: TextStyle(fontSize: 15, height: 1.5),
+                          decoration: InputDecoration(
                             isDense: true,
                             hintText: '質問',
+                            hintStyle: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 15,
+                              height: 1.5,
+                              fontWeight: FontWeight.w400,
+                            ),
                             contentPadding: EdgeInsets.all(8),
                             enabledBorder: OutlineInputBorder(),
                             focusedBorder: OutlineInputBorder(
@@ -157,13 +165,19 @@ class CreateScreen extends ScreenBase {
                           minLines: 2,
                           maxLines: 6,
                           keyboardType: TextInputType.multiline,
-                          cursorHeight: 16,
-                          cursorColor: Colors.black87,
-                          style: const TextStyle(fontSize: 14, height: 1.4),
+                          cursorHeight: 18,
+                          cursorColor: Colors.grey.shade800,
+                          style: TextStyle(fontSize: 15, height: 1.5),
                           decoration: InputDecoration(
                             isDense: true,
                             contentPadding: const EdgeInsets.all(8),
                             hintText: '選択肢1',
+                            hintStyle: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 15,
+                              height: 1.5,
+                              fontWeight: FontWeight.w400,
+                            ),
                             enabledBorder: OutlineInputBorder(
                               borderSide:
                                   BorderSide(color: colorSet.value.rightColor),
@@ -209,12 +223,18 @@ class CreateScreen extends ScreenBase {
                           minLines: 2,
                           maxLines: 6,
                           keyboardType: TextInputType.multiline,
-                          cursorHeight: 16,
-                          cursorColor: Colors.black87,
-                          style: const TextStyle(fontSize: 14, height: 1.4),
+                          cursorHeight: 18,
+                          cursorColor: Colors.grey.shade800,
+                          style: TextStyle(fontSize: 15, height: 1.5),
                           decoration: InputDecoration(
                             isDense: true,
                             hintText: '選択肢2',
+                            hintStyle: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 15,
+                              height: 1.5,
+                              fontWeight: FontWeight.w400,
+                            ),
                             contentPadding: const EdgeInsets.all(8),
                             enabledBorder: OutlineInputBorder(
                               borderSide:

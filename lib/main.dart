@@ -29,6 +29,7 @@ class MyApp extends HookConsumerWidget {
     return MaterialApp.router(
       title: 'Which',
       theme: ThemeData(
+        fontFamily: 'NotoSansJP',
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: Colors.blueGrey,
           accentColor: Colors.blueGrey.shade800,

@@ -40,6 +40,7 @@ class HomeScreen extends ScreenBase {
     QuestionsNotifier questionsNotifier,
     PageController pageController,
   ) async {
+    value = value.trim();
     if (value.isEmpty) return;
     await showFutureLoading(
       context,
@@ -256,6 +257,9 @@ class HomeScreen extends ScreenBase {
                       hintText: '検索',
                       hintStyle: TextStyle(
                         color: Colors.white.withOpacity(0.8),
+                        fontSize: 16,
+                        height: 1.3,
+                        fontWeight: FontWeight.w400,
                       ),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.2),

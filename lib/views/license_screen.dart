@@ -115,10 +115,7 @@ class LicenceDetailScreen extends ScreenBase {
                     ),
                     child: Text(
                       p.text,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w300,
-                        fontSize: 14,
-                      ),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   );
                 },

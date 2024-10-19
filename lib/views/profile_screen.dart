@@ -139,13 +139,21 @@ class ProfileScreen extends ScreenBase {
               TextFormField(
                 controller: nameController,
                 keyboardType: TextInputType.name,
-                cursorHeight: 20,
-                decoration: const InputDecoration(
+                cursorHeight: 18,
+                cursorColor: Colors.grey.shade800,
+                style: const TextStyle(fontSize: 15, height: 1.5),
+                decoration: InputDecoration(
                   isDense: true,
                   contentPadding: EdgeInsets.all(5),
                   enabledBorder: UnderlineInputBorder(),
                   focusedBorder: UnderlineInputBorder(),
                   hintText: '名前',
+                  hintStyle: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                  ),
                   errorBorder: UnderlineInputBorder(),
                   focusedErrorBorder: UnderlineInputBorder(),
                 ),

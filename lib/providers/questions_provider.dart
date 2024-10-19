@@ -36,6 +36,7 @@ class QuestionsNotifier extends StateNotifier<List<Question?>> {
   }
 
   Future<List<Question?>> searchQuestions({required String input}) async {
+    input = input.trim();
     if (input.isEmpty) return [];
     ref.read(indexesProvider.notifier).init();
     final List<Question> questions =

@@ -61,7 +61,6 @@ class TermScreen extends ScreenBase {
                         ? TextAlign.center
                         : TextAlign.left,
                 style: TextStyle(
-                  fontWeight: FontWeight.w300,
                   fontSize: term.type == 'title' ? 20 : 14,
                 ),
               ),
