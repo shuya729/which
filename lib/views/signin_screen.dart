@@ -21,17 +21,20 @@ class SigninScreen extends ScreenBase {
 
   String get sign => 'Sign in';
   String get other => '新規登録';
-  String get errorMsg => 'サインインに失敗しました。';
 
   Future<void> toOther(BuildContext context) async {
     await context.push(RegistScreen.absolutePath);
   }
 
-  void afterDialog(BuildContext context, _) async {
-    if (context.mounted) context.go(HomeScreen.absolutePath);
+  void nextPage(ValueNotifier<String> asyncPath) {
+    asyncPath.value = HomeScreen.absolutePath;
   }
 
-  Future<void> _getGoogle(BuildContext context) async {
+  Future<void> _getGoogle(
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) async {
+    bool ret = false;
     if (kIsWeb) {
       final GoogleAuthProvider googleProvider = GoogleAuthProvider();
       googleProvider
@@ -39,37 +42,43 @@ class SigninScreen extends ScreenBase {
       googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
       googleProvider
           .addScope('https://www.googleapis.com/auth/userinfo.profile');
-      await continueWithProvider(context, googleProvider);
+      ret = await continueWithProvider(asyncMsg, googleProvider);
     } else {
       final GoogleSignInAccount? googleUser =
           await GoogleSignIn(scopes: ['email', 'profile']).signIn();
-      if (googleUser == null) throw Exception('unnotified-error');
+      if (googleUser == null) return;
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      if (context.mounted) await continueWithCredential(context, credential);
+      ret = await continueWithCredential(asyncMsg, credential);
     }
+    if (ret) nextPage(asyncPath);
   }
 
-  Future<void> _getApple(BuildContext context) async {
+  Future<void> _getApple(
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) async {
     final AppleAuthProvider appleProvider = AppleAuthProvider();
     appleProvider.addScope('email');
     appleProvider.addScope('name');
-    await continueWithProvider(context, appleProvider);
+    final bool ret = await continueWithProvider(asyncMsg, appleProvider);
+    if (ret) nextPage(asyncPath);
   }
 
-  Future<void> continueWithCredential(
-    BuildContext context,
+  Future<bool> continueWithCredential(
+    ValueNotifier<String> asyncMsg,
     OAuthCredential credential,
   ) async {
     await FirebaseAuth.instance.signInWithCredential(credential);
+    return true;
   }
 
-  Future<void> continueWithProvider(
-    BuildContext context,
+  Future<bool> continueWithProvider(
+    ValueNotifier<String> asyncMsg,
     AuthProvider provider,
   ) async {
     if (kIsWeb) {
@@ -77,26 +86,33 @@ class SigninScreen extends ScreenBase {
     } else {
       await FirebaseAuth.instance.signInWithProvider(provider);
     }
+    return true;
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     return textTemp(
+      loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return Column(
           children: [
-            const Text('以下の方法でサインインしてください。'),
+            Text('以下の方法で$titleしてください。'),
             const SizedBox(height: 50),
             SizedBox(
               width: 210,
               height: 33,
               child: OutlinedButton.icon(
                 onPressed: () => showFutureLoading(
-                  context,
-                  _getGoogle(context),
-                  errorValue: null,
-                  errorMsg: errorMsg,
-                  afterDialog: afterDialog,
+                  loading,
+                  asyncMsg,
+                  _getGoogle(asyncPath, asyncMsg),
                 ),
                 icon: Image.asset(
                   'assets/system/google_logo.png',
@@ -125,11 +141,9 @@ class SigninScreen extends ScreenBase {
               height: 33,
               child: OutlinedButton.icon(
                 onPressed: () => showFutureLoading(
-                  context,
-                  _getApple(context),
-                  errorValue: null,
-                  errorMsg: errorMsg,
-                  afterDialog: afterDialog,
+                  loading,
+                  asyncMsg,
+                  _getApple(asyncPath, asyncMsg),
                 ),
                 icon: Image.asset(
                   'assets/system/apple_logo.png',

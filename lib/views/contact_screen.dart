@@ -22,6 +22,7 @@ class ContactScreen extends ScreenBase {
     required TextEditingController emailController,
     required ValueNotifier<int> subjectValue,
     required TextEditingController contentController,
+    required ValueNotifier<String> asyncMsg,
   }) async {
     final Contact contact = Contact.init(
       authId: myData.authId,
@@ -31,10 +32,22 @@ class ContactScreen extends ScreenBase {
       content: contentController.text,
     );
     await FirestoreService().addContact(contact);
+    nameController.text = myData.name;
+    emailController.clear();
+    contentController.clear();
+    subjectValue.value = 0;
+    asyncMsg.value = 'お問い合わせを受け付けました。';
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     final GlobalKey<FormState> formKey = useState(GlobalKey<FormState>()).value;
     final TextEditingController nameController =
         useTextEditingController(text: myData.name);
@@ -42,6 +55,7 @@ class ContactScreen extends ScreenBase {
     final TextEditingController contentController = useTextEditingController();
     final ValueNotifier<int> subjectValue = useState(0);
     return textTemp(
+      loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return Form(
           key: formKey,
@@ -145,7 +159,7 @@ class ContactScreen extends ScreenBase {
                       'ご意見',
                       style: TextStyle(fontSize: 16),
                     ),
-                    fillColor: const WidgetStatePropertyAll(Colors.blueGrey),
+                    fillColor: const WidgetStatePropertyAll(Colors.grey),
                     onChanged: (_) => subjectValue.value = 0,
                   ),
                   RadioListTile(
@@ -158,7 +172,7 @@ class ContactScreen extends ScreenBase {
                       '不具合報告',
                       style: TextStyle(fontSize: 16),
                     ),
-                    fillColor: const WidgetStatePropertyAll(Colors.blueGrey),
+                    fillColor: const WidgetStatePropertyAll(Colors.grey),
                     onChanged: (_) => subjectValue.value = 1,
                   ),
                   RadioListTile(
@@ -171,7 +185,7 @@ class ContactScreen extends ScreenBase {
                       'アカウント削除申請',
                       style: TextStyle(fontSize: 16),
                     ),
-                    fillColor: const WidgetStatePropertyAll(Colors.blueGrey),
+                    fillColor: const WidgetStatePropertyAll(Colors.grey),
                     onChanged: (_) => subjectValue.value = 2,
                   ),
                   RadioListTile(
@@ -184,7 +198,7 @@ class ContactScreen extends ScreenBase {
                       'その他',
                       style: TextStyle(fontSize: 16),
                     ),
-                    fillColor: const WidgetStatePropertyAll(Colors.blueGrey),
+                    fillColor: const WidgetStatePropertyAll(Colors.grey),
                     onChanged: (_) => subjectValue.value = 3,
                   ),
                 ],
@@ -229,31 +243,25 @@ class ContactScreen extends ScreenBase {
               const SizedBox(height: 50),
               Center(
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: () {
                     if (formKey.currentState?.validate() ?? false) {
-                      await showFutureLoading(
-                        context,
+                      showFutureLoading(
+                        loading,
+                        asyncMsg,
                         _addContact(
                           myData: myData,
                           nameController: nameController,
                           emailController: emailController,
                           subjectValue: subjectValue,
                           contentController: contentController,
+                          asyncMsg: asyncMsg,
                         ),
-                        errorValue: null,
                       );
-                      nameController.text = myData.name;
-                      emailController.clear();
-                      contentController.clear();
-                      subjectValue.value = 0;
-                      if (context.mounted) {
-                        showMsgBar(context, 'お問い合わせを受け付けました。');
-                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.black.withOpacity(0.8),
+                    backgroundColor: Colors.black87,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

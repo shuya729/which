@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_レイヤー_1" data-name="レイヤー 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #036;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        font-family: AvenirNext-DemiBold, 'Avenir Next';
+        font-size: 14px;
+        font-weight: 300;
+      }
+
+      .cls-3 {
+        fill: #9fc;
+      }
+    </style>
+  </defs>
+  <g>
+    <path class="cls-3" d="M38,13c-4,2-7,10-8,17s-4,15-8,17C16.78,49.61,10,44,0,30c0,16.57,13.43,30,30,30s30-13.43,30-30c-10-14-16.78-19.61-22-17Z"/>
+    <path class="cls-1" d="M0,30c10,14,16.78,19.61,22,17,4-2,7-10,8-17s4-15,8-17c5.22-2.61,12,3,22,17C60,13.43,46.57,0,30,0S0,13.43,0,30Z"/>
+  </g>
+  <text class="cls-2" transform="translate(11.76 42.54)"><tspan x="0" y="0">Bi</tspan></text>
+  <text class="cls-2" transform="translate(29.67 42.54)"><tspan x="0" y="0">Pick</tspan></text>
+</svg>

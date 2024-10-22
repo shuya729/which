@@ -15,6 +15,8 @@ class TermScreen extends ScreenBase {
   String get title => '利用規約';
   static const String absolutePath = '/term';
   static const String relativePath = 'term';
+  @override
+  bool get initLoading => true;
 
   Future<List<Terms>> _getTerms() async {
     final String data = await rootBundle.loadString('assets/terms/term.json');
@@ -27,19 +29,22 @@ class TermScreen extends ScreenBase {
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     final future = useMemoized(
-      () => showFutureLoading<List<Terms>>(
-        context,
-        _getTerms(),
-        errorValue: List<Terms>.empty(growable: true),
-        errorMsg: '利用規約の取得に失敗しました.',
-      ),
+      () => showFutureLoading(loading, asyncMsg, _getTerms()),
     );
-    final AsyncSnapshot<List<Terms>> asyncSnapshot = useFuture(future);
+    final AsyncSnapshot<List<Terms>?> asyncSnapshot = useFuture(future);
 
     final List<Terms> terms = asyncSnapshot.data ?? [];
     return textTemp(
+      loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return ListView.builder(
           shrinkWrap: true,

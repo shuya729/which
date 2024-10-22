@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/indexes.dart';
@@ -9,28 +10,96 @@ import 'package:which/views/create_screen.dart';
 import 'package:which/widgets/loading_widget.dart';
 import 'package:which/widgets/which_widget.dart';
 
-abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
+abstract class ScreenBase extends HookConsumerWidget {
   const ScreenBase({super.key});
 
   @protected
   String get title;
   @protected
   bool? get allowAnonymous => null;
+  @protected
+  bool get initLoading => false;
 
   @protected
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData);
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  );
+
+  Future<T?> showFutureLoading<T>(
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncMsg,
+    Future<T> future, {
+    String message = 'エラーが発生しました。',
+  }) async {
+    try {
+      if (!loading.value) loading.value = true;
+      final T? ret = await future;
+      loading.value = false;
+      return ret;
+    } catch (e) {
+      loading.value = false;
+      asyncMsg.value = message;
+      return null;
+    }
+  }
+
+  void showMsgBar(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(msg),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ValueNotifier<bool> loading = useState(initLoading);
+    final ValueNotifier<String> asyncPath = useState('');
+    useEffect(() {
+      if (asyncPath.value.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go(asyncPath.value);
+        });
+      }
+      return null;
+    }, [asyncPath.value]);
+    final ValueNotifier<String> asyncMsg = useState('');
+    useEffect(() {
+      if (asyncMsg.value.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showMsgBar(context, asyncMsg.value);
+        });
+      }
+      return null;
+    }, [asyncMsg.value]);
+
     final AsyncValue<UserData> myData = ref.watch(userStreamProvider);
     return myData.when<Widget>(
       data: (UserData data) {
         if (allowAnonymous == true && !data.anonymousFlg) {
-          return dispTemp(msg: '不正な画面遷移です。');
+          return dispTemp(
+            msg: '不正な画面遷移です。',
+          );
         } else if (allowAnonymous == false && data.anonymousFlg) {
           return dispTemp(msg: 'ログインが必要です。');
         } else {
-          return userBuild(context, ref, data);
+          return userBuild(
+            context,
+            ref,
+            data,
+            loading,
+            asyncPath,
+            asyncMsg,
+          );
         }
       },
       loading: () => loadingTemp(),
@@ -39,11 +108,12 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
   }
 
   Widget textTemp({
+    required bool loading,
     required Widget Function(BuildContext context, BoxConstraints constraints)
         builder,
   }) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey.shade50,
+      backgroundColor: Colors.grey.shade200,
       appBar: title.isEmpty
           ? null
           : PreferredSize(
@@ -63,42 +133,60 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
                 ),
               ),
             ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: Center(
-                child: Container(
-                  width: constraints.maxWidth * 0.94,
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  margin: EdgeInsets.symmetric(
-                    vertical: constraints.maxHeight * 0.03,
-                  ),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Container(
-                    width: constraints.maxWidth * 0.8,
-                    constraints: const BoxConstraints(maxWidth: 600),
-                    margin: EdgeInsets.only(
-                      top: constraints.maxHeight * 0.07,
-                      bottom: constraints.maxHeight * 0.07 + 20,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: Center(
+                    child: Container(
+                      width: constraints.maxWidth * 0.94,
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      margin: EdgeInsets.symmetric(
+                        vertical: constraints.maxHeight * 0.03,
+                      ),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Container(
+                        width: constraints.maxWidth * 0.8,
+                        constraints: const BoxConstraints(maxWidth: 600),
+                        margin: EdgeInsets.only(
+                          top: constraints.maxHeight * 0.07,
+                          bottom: constraints.maxHeight * 0.07 + 20,
+                        ),
+                        child: builder(context, constraints),
+                      ),
                     ),
-                    child: builder(context, constraints),
                   ),
-                ),
-              ),
-            );
-          },
-        ),
+                );
+              },
+            ),
+          ),
+          loading
+              ? ModalBarrier(
+                  dismissible: false,
+                  color: Colors.white60,
+                )
+              : const SizedBox(),
+          AnimatedOpacity(
+            opacity: loading ? 1 : 0,
+            duration: const Duration(milliseconds: 100),
+            child: const LoadingWidget(),
+          ),
+        ],
       ),
     );
   }
 
   Widget listTemp({
+    required bool loading,
     required int itemCount,
     required Widget Function(
             BuildContext context, BoxConstraints constraints, int index)
@@ -125,33 +213,49 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
                 ),
               ),
             ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: Center(
-                child: Container(
-                  width: constraints.maxWidth * 0.94,
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  margin: EdgeInsets.symmetric(
-                    vertical: constraints.maxHeight * 0.03,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: Center(
+                    child: Container(
+                      width: constraints.maxWidth * 0.94,
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      margin: EdgeInsets.symmetric(
+                        vertical: constraints.maxHeight * 0.03,
+                      ),
+                      alignment: Alignment.center,
+                      child: ListView.builder(
+                        controller: scrollController,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 40),
+                        itemCount: itemCount,
+                        itemBuilder: (context, index) {
+                          return itemBuilder(context, constraints, index);
+                        },
+                      ),
+                    ),
                   ),
-                  alignment: Alignment.center,
-                  child: ListView.builder(
-                    controller: scrollController,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: 40),
-                    itemCount: itemCount,
-                    itemBuilder: (context, index) {
-                      return itemBuilder(context, constraints, index);
-                    },
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
+                );
+              },
+            ),
+          ),
+          loading
+              ? ModalBarrier(
+                  dismissible: false,
+                  color: Colors.white60,
+                )
+              : const SizedBox(),
+          AnimatedOpacity(
+            opacity: loading ? 1 : 0,
+            duration: const Duration(milliseconds: 100),
+            child: const LoadingWidget(),
+          ),
+        ],
       ),
     );
   }
@@ -229,7 +333,7 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
             child: const Icon(
               Icons.refresh,
               size: 40,
-              color: Colors.blueGrey,
+              color: Colors.grey,
             ),
           ),
         ),
@@ -238,6 +342,8 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
   }
 
   Widget questionsTemp({
+    required bool loading,
+    required ValueNotifier<String> asyncMsg,
     required UserData myData,
     int? itemCount,
     required PageController pageController,
@@ -274,7 +380,11 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
               final int pageIndex = indexes.pageIndex(index);
               final Question? question = questions[pageIndex];
               if (question == null) return _nullWidget(refreshFunction, diff);
-              return WhichWidget(myData: myData, question: question);
+              return WhichWidget(
+                myData: myData,
+                question: question,
+                asyncMsg: asyncMsg,
+              );
             },
           ),
           SafeArea(
@@ -314,7 +424,7 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
                                 ? const Icon(Icons.refresh)
                                 : const Icon(Icons.keyboard_arrow_up),
                             style: IconButton.styleFrom(
-                              foregroundColor: Colors.white.withOpacity(0.8),
+                              foregroundColor: Colors.white70,
                             ),
                           ),
                           ElevatedButton.icon(
@@ -326,7 +436,7 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
                             style: ElevatedButton.styleFrom(
                               elevation: 2,
                               foregroundColor: Colors.white,
-                              backgroundColor: Colors.black.withOpacity(0.8),
+                              backgroundColor: Colors.black87,
                               minimumSize: const Size(110, 45),
                               maximumSize: const Size(240, 50),
                               fixedSize: Size(
@@ -355,7 +465,7 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
                                 ? const Icon(Icons.refresh)
                                 : const Icon(Icons.keyboard_arrow_down),
                             style: IconButton.styleFrom(
-                              foregroundColor: Colors.white.withOpacity(0.8),
+                              foregroundColor: Colors.white70,
                             ),
                           ),
                         ],
@@ -372,66 +482,21 @@ abstract class ScreenBase extends HookConsumerWidget with ScreenBaseFunction {
               color: Colors.white.withOpacity((diff * 4).clamp(0, 0.4)),
             ),
           ),
+          loading
+              ? ModalBarrier(
+                  dismissible: false,
+                  color: Colors.white60,
+                )
+              : const SizedBox(),
+          AnimatedOpacity(
+            opacity: loading ? 1 : 0,
+            duration: const Duration(milliseconds: 100),
+            child: const LoadingWidget(),
+          ),
         ],
       ),
       drawer: drawer,
       endDrawer: endDrawer,
-    );
-  }
-}
-
-mixin class ScreenBaseFunction {
-  Future<T> showFutureLoading<T>(
-    BuildContext context,
-    Future<T> future, {
-    required T errorValue,
-    String? errorMsg,
-    void Function(BuildContext context, T ret)? afterDialog,
-    Color? barrierColor,
-  }) async {
-    bool errorFlg = false;
-    bool unnotifieFlg = false;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          barrierColor: barrierColor ?? Colors.white60,
-          builder: (context) => const LoadingWidget(),
-        );
-      }
-    });
-    final T ret = await future.catchError((e) {
-      errorFlg = true;
-      unnotifieFlg = e.toString() == 'unnotified-error';
-      return errorValue;
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (context.mounted) {
-        Navigator.pop(context);
-        if (!unnotifieFlg) {
-          if (errorFlg) {
-            if (context.mounted) showMsgBar(context, errorMsg ?? 'エラーが発生しました。');
-          } else {
-            if (afterDialog != null && context.mounted) {
-              afterDialog(context, ret);
-            }
-          }
-        }
-      }
-    });
-    return ret;
-  }
-
-  void showMsgBar(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(msg),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
     );
   }
 }

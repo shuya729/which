@@ -25,10 +25,9 @@ class ProfileScreen extends ScreenBase {
   bool disabled(ValueNotifier<Uint8List?> imageData, bool sameName) =>
       imageData.value == null && sameName;
 
-  void afterDialog(BuildContext context, _) {}
-
   Future<void> save({
-    required BuildContext context,
+    required ValueNotifier<String> asyncPath,
+    required ValueNotifier<String> asyncMsg,
     required UserData myData,
     required TextEditingController nameController,
     required ValueNotifier<Uint8List?> imageData,
@@ -44,6 +43,7 @@ class ProfileScreen extends ScreenBase {
         : await storageService.putIcon(myData.authId, image);
     await firestoreService.updateProfile(myData, name, imageUrl);
     imageData.value = null;
+    asyncMsg.value = 'プロフィールを更新しました。';
   }
 
   Future<void> _pickImage({
@@ -91,7 +91,14 @@ class ProfileScreen extends ScreenBase {
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     final GlobalKey<FormState> formKey = useState(GlobalKey<FormState>()).value;
     final TextEditingController nameController =
         useTextEditingController(text: myData.name);
@@ -102,6 +109,7 @@ class ProfileScreen extends ScreenBase {
     if (screenValidate(myData)) return dispTemp(msg: '不正な画面遷移です。');
 
     return textTemp(
+      loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return Form(
           key: formKey,
@@ -110,10 +118,10 @@ class ProfileScreen extends ScreenBase {
               Center(
                 child: IconButton(
                   onPressed: () => showFutureLoading(
-                    context,
+                    loading,
+                    asyncMsg,
                     _pickImage(context: context, imageData: imageData),
-                    errorValue: null,
-                    errorMsg: '画像の取得に失敗しました。',
+                    message: '画像の取得に失敗しました。',
                   ),
                   icon: CircleAvatar(
                     radius: 36,
@@ -126,8 +134,7 @@ class ProfileScreen extends ScreenBase {
                   ),
                   style: IconButton.styleFrom(
                     padding: const EdgeInsets.all(4),
-                    backgroundColor: Colors.black.withOpacity(0.3),
-                    foregroundColor: Colors.black.withOpacity(1),
+                    backgroundColor: Colors.black12,
                   ),
                 ),
               ),
@@ -176,22 +183,21 @@ class ProfileScreen extends ScreenBase {
                       : () {
                           if (formKey.currentState?.validate() ?? false) {
                             showFutureLoading(
-                              context,
+                              loading,
+                              asyncMsg,
                               save(
-                                context: context,
+                                asyncPath: asyncPath,
+                                asyncMsg: asyncMsg,
                                 myData: myData,
                                 nameController: nameController,
                                 imageData: imageData,
                               ),
-                              errorValue: null,
-                              errorMsg: 'アップロードに失敗しました。',
-                              afterDialog: afterDialog,
                             );
                           }
                         },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.black.withOpacity(0.8),
+                    backgroundColor: Colors.black87,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

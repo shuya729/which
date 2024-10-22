@@ -33,7 +33,7 @@ class CircleIndexes extends Indexes {
       top = _calcTop(this.top, this.bottom, bottom);
     }
     print(
-        'top: ${(top ?? this.top) % limit}, current: ${(current ?? this.current) % limit}, bottom: ${(bottom ?? this.bottom) % limit}, load: ${(load ?? this.load) % limit}, multiplier: $multiplier');
+        'top: ${(top ?? this.top) % limit}, current: ${(current ?? this.current) % limit}, bottom: ${(bottom ?? this.bottom) % limit}, load: ${(load ?? this.load) % limit}, multiplier: ${multiplier ?? this.multiplier}');
     return CircleIndexes(
       top: top ?? this.top,
       current: current ?? this.current,

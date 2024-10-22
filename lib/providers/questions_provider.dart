@@ -17,6 +17,7 @@ class QuestionsNotifier extends StateNotifier<List<Question?>> {
   Future<List<Question?>> initQuestions({String? id}) async {
     final List<Question> questions =
         await _functionService.initQuestions(questionId: id);
+    ref.read(indexesProvider.notifier).init();
     state = [...questions]..length = CircleIndexes.limit;
     ref.read(indexesProvider.notifier).loaded(questions.length);
     return questions;

@@ -19,6 +19,8 @@ class CreatedScreen extends ScreenBase {
   bool? get allowAnonymous => false;
   static const String absolutePath = '/created';
   static const String relativePath = 'created';
+  @override
+  bool get initLoading => true;
 
   Future<List<Question?>> initQuestions(
     UserData myData,
@@ -67,7 +69,8 @@ class CreatedScreen extends ScreenBase {
   }
 
   Future<void> _refresh(
-    BuildContext context,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncMsg,
     UserData myData,
     ValueNotifier<List<Question?>> questions,
     PageController pageController,
@@ -75,17 +78,13 @@ class CreatedScreen extends ScreenBase {
     ValueNotifier<double> diff,
   ) async {
     pageController.jumpToPage(0);
-    await showFutureLoading(
-      context,
+    final List<Question?>? ret = await showFutureLoading(
+      loading,
+      asyncMsg,
       refreshQuestions(myData, questions, indexes),
-      errorValue: <Question?>[],
-      errorMsg: 'データの取得に失敗しました。',
-      afterDialog: (context, ret) {
-        if (ret.isEmpty) {
-          showMsgBar(context, '質問が見つかりませんでした。');
-        }
-      },
+      message: 'データの取得に失敗しました。',
     );
+    if (ret != null && ret.isEmpty) asyncMsg.value = '質問が見つかりませんでした。';
     diff.value = 0;
   }
 
@@ -102,7 +101,8 @@ class CreatedScreen extends ScreenBase {
   }
 
   Future<void> _reload(
-    BuildContext context,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncMst,
     UserData myData,
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
@@ -114,21 +114,19 @@ class CreatedScreen extends ScreenBase {
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeInBack,
     );
-    await showFutureLoading(
-      context,
+    final List<Question?>? ret = await showFutureLoading(
+      loading,
+      asyncMst,
       getQuestions(myData, questions, indexes),
-      errorValue: <Question?>[],
-      errorMsg: 'データの取得に失敗しました。',
-      afterDialog: (context, ret) {
-        if (ret.isEmpty) {
-          showMsgBar(context, '質問が見つかりませんでした。');
-        }
-      },
+      message: 'データの取得に失敗しました。',
     );
+    if (ret != null && ret.isEmpty) asyncMst.value = '質問が見つかりませんでした。';
   }
 
   void _listener(
-    BuildContext context,
+    double hieight,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncMsg,
     UserData myData,
     PageController pageController,
     ValueNotifier<List<Question?>> questions,
@@ -137,18 +135,19 @@ class CreatedScreen extends ScreenBase {
   ) {
     if (pageController.hasClients) {
       final int page = pageController.page?.round() ?? 0;
-      final double position =
-          pageController.position.pixels / MediaQuery.of(context).size.height;
+      final double position = pageController.position.pixels / hieight;
       if (page == indexes.value.top) {
         final double diffValue = page - position;
         if (diffValue > 0.1 && diff.value <= 0.1) {
-          _refresh(context, myData, questions, pageController, indexes, diff);
+          _refresh(loading, asyncMsg, myData, questions, pageController,
+              indexes, diff);
         }
         diff.value = diffValue;
       } else if (page == indexes.value.bottom) {
         final diffValue = position - page;
         if (diffValue > 0.1 && diff.value <= 0.1) {
-          _reload(context, myData, questions, indexes, pageController);
+          _reload(
+              loading, asyncMsg, myData, questions, indexes, pageController);
         }
         diff.value = diffValue;
       } else {
@@ -158,14 +157,23 @@ class CreatedScreen extends ScreenBase {
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     final PageController pageController = usePageController();
     final ValueNotifier<List<Question?>> questions = useState([]);
     final ValueNotifier<Indexes> indexes = useState(const Indexes());
     final ValueNotifier<double> diff = useState(0);
     useEffect(() {
       listener() => _listener(
-            context,
+            MediaQuery.of(context).size.height,
+            loading,
+            asyncMsg,
             myData,
             pageController,
             questions,
@@ -178,10 +186,10 @@ class CreatedScreen extends ScreenBase {
 
     final future = useMemoized(
       () => showFutureLoading(
-        context,
+        loading,
+        asyncMsg,
         initQuestions(myData, questions, indexes),
-        errorValue: <Question?>[],
-        errorMsg: '質問の取得に失敗しました。',
+        message: '質問の取得に失敗しました。',
       ),
     );
     final AsyncSnapshot asyncSnapshot = useFuture(future);
@@ -192,6 +200,8 @@ class CreatedScreen extends ScreenBase {
     }
 
     return questionsTemp(
+      loading: loading.value,
+      asyncMsg: asyncMsg,
       myData: myData,
       itemCount: questions.value.length,
       pageController: pageController,
@@ -205,7 +215,8 @@ class CreatedScreen extends ScreenBase {
         questions,
       ),
       refreshFunction: () => _refresh(
-        context,
+        loading,
+        asyncMsg,
         myData,
         questions,
         pageController,
@@ -213,7 +224,8 @@ class CreatedScreen extends ScreenBase {
         diff,
       ),
       reloadFunciton: () => _reload(
-        context,
+        loading,
+        asyncMsg,
         myData,
         questions,
         indexes,
@@ -232,7 +244,7 @@ class CreatedScreen extends ScreenBase {
                 style: IconButton.styleFrom(
                   iconSize: 18,
                   foregroundColor: Colors.white,
-                  backgroundColor: Colors.white.withOpacity(0.2),
+                  backgroundColor: Colors.white24,
                 ),
               ),
               const SizedBox(width: 10),
@@ -242,7 +254,7 @@ class CreatedScreen extends ScreenBase {
                   alignment: Alignment.center,
                   constraints: const BoxConstraints(maxWidth: 500),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white30,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(

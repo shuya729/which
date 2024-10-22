@@ -7,9 +7,7 @@ import 'package:which/firebase_options.dart';
 import 'package:which/providers/router_provider.dart';
 
 Future<void> main() async {
-  // ignore: prefer_const_constructors
   setUrlStrategy(PathUrlStrategy());
-  // final widgetsBinding =
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
@@ -27,14 +25,14 @@ class MyApp extends HookConsumerWidget {
     final GoRouter router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'Which',
+      title: 'BiPick',
       theme: ThemeData(
         fontFamily: 'NotoSansJP',
         colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.blueGrey,
-          accentColor: Colors.blueGrey.shade800,
+          primarySwatch: Colors.grey,
+          accentColor: Colors.grey.shade800,
           cardColor: Colors.white,
-          backgroundColor: Colors.blueGrey.shade50,
+          backgroundColor: Colors.grey.shade50,
           errorColor: Colors.red,
           brightness: Brightness.light,
         ),

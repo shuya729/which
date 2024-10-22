@@ -13,6 +13,8 @@ class LicenseScreen extends ScreenBase {
   String get title => 'ライセンス情報';
   static const String absolutePath = '/licence';
   static const String relativePath = 'licence';
+  @override
+  bool get initLoading => true;
 
   Future<List<String>> _getPackages() async {
     final Stream stream = LicenseRegistry.licenses;
@@ -26,19 +28,22 @@ class LicenseScreen extends ScreenBase {
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     final future = useMemoized(
-      () => showFutureLoading<List<String>>(
-        context,
-        _getPackages(),
-        errorValue: List<String>.empty(growable: true),
-        errorMsg: 'ライセンス情報の取得に失敗しました。',
-      ),
+      () => showFutureLoading(loading, asyncMsg, _getPackages()),
     );
-    final AsyncSnapshot<List<String>> asyncSnapshot = useFuture(future);
+    final AsyncSnapshot<List<String>?> asyncSnapshot = useFuture(future);
 
     final List<String> packages = asyncSnapshot.data ?? [];
     return listTemp(
+      loading: loading.value,
       itemCount: packages.length,
       itemBuilder:
           (BuildContext context, BoxConstraints constraints, int index) {
@@ -77,16 +82,18 @@ class LicenceDetailScreen extends ScreenBase {
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     final future = useMemoized(
-      () => showFutureLoading<List<List<LicenseParagraph>>>(
-        context,
-        _getParagraphs(),
-        errorValue: List<List<LicenseParagraph>>.empty(growable: true),
-        errorMsg: 'ライセンス情報の取得に失敗しました.',
-      ),
+      () => showFutureLoading(loading, asyncMsg, _getParagraphs()),
     );
-    final AsyncSnapshot<List<List<LicenseParagraph>>> asyncSnapshot =
+    final AsyncSnapshot<List<List<LicenseParagraph>>?> asyncSnapshot =
         useFuture(future);
 
     if (asyncSnapshot.hasData && asyncSnapshot.data!.isEmpty) {
@@ -95,6 +102,7 @@ class LicenceDetailScreen extends ScreenBase {
 
     final List<List<LicenseParagraph>> paragraphs = asyncSnapshot.data ?? [];
     return textTemp(
+      loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return ListView.separated(
           shrinkWrap: true,

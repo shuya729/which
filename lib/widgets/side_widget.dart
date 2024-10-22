@@ -87,7 +87,7 @@ class SideWidget extends HookConsumerWidget {
                     iconSize: 20,
                     style: IconButton.styleFrom(
                       visualDensity: VisualDensity.compact,
-                      foregroundColor: Colors.white.withOpacity(0.8),
+                      foregroundColor: Colors.white70,
                     ),
                   ),
                 ),
@@ -148,7 +148,7 @@ class SideWidget extends HookConsumerWidget {
                                 minFontSize: 22,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white70,
                                   fontSize: 28,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -169,7 +169,7 @@ class SideWidget extends HookConsumerWidget {
                             textAlign: TextAlign.center,
                             maxLines: 1,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white70,
                               fontSize: 22,
                               fontWeight: FontWeight.w400,
                               fontFeatures: const [

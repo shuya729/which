@@ -37,11 +37,19 @@ class CreateScreen extends ScreenBase {
       answer2: answer2Value,
     );
     await FirestoreService().addQuestion(question);
+    if (context.mounted) context.pop();
     return question;
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     final formKey = useState(GlobalKey<FormState>()).value;
     final questController = useTextEditingController();
     final answer1Controller = useTextEditingController();
@@ -60,8 +68,9 @@ class CreateScreen extends ScreenBase {
             child: ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState?.validate() ?? false) {
-                  await showFutureLoading(
-                    context,
+                  showFutureLoading(
+                    loading,
+                    asyncMsg,
                     _post(
                       context: context,
                       myData: myData,
@@ -70,10 +79,6 @@ class CreateScreen extends ScreenBase {
                       answer1Controller: answer1Controller,
                       answer2Controller: answer2Controller,
                     ),
-                    errorValue: null,
-                    afterDialog: (context, ret) {
-                      if (ret != null && context.mounted) context.pop();
-                    },
                   );
                 }
               },

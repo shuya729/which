@@ -50,6 +50,8 @@ dependencies:
   share_plus:
   google_sign_in:
   cloud_functions:
+  flutter_native_splash:
+  flutter_launcher_icons:
 
 dev_dependencies:
   flutter_test:
@@ -126,3 +128,20 @@ flutter:
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  ios: true
+  image_path_ios: "assets/images/bipick_icon_1024.png"
+  remove_alpha_ios: true
+  android: true
+  image_path_android: "assets/images/bipick_icon_1024.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/images/bipick_icon_512.png"
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: "assets/images/bipick_splash_768.png"
+
+  android_12:
+    image: "assets/images/bipick_splash_1152.png"
+    color: "#ffffff"

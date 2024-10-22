@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/circle_indexes.dart';
 import 'package:which/models/question.dart';
@@ -35,30 +36,30 @@ class HomeScreen extends ScreenBase {
   }
 
   Future<void> _onSubmit(
-    BuildContext context,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncMsg,
     String value,
     QuestionsNotifier questionsNotifier,
     PageController pageController,
   ) async {
     value = value.trim();
     if (value.isEmpty) return;
-    await showFutureLoading(
-      context,
+    final List<Question?>? ret = await showFutureLoading(
+      loading,
+      asyncMsg,
       questionsNotifier.searchQuestions(input: value),
-      errorValue: <Question?>[],
-      errorMsg: '検索に失敗しました。',
-      afterDialog: (context, ret) {
-        if (ret.isEmpty) {
-          showMsgBar(context, '質問が見つかりませんでした。');
-        } else {
-          pageController.jumpToPage(0);
-        }
-      },
+      message: '検索に失敗しました。',
     );
+    if (ret != null && ret.isEmpty) {
+      asyncMsg.value = '質問が見つかりませんでした。';
+    } else {
+      pageController.jumpToPage(0);
+    }
   }
 
   Future<void> _refreshQuestions(
-    BuildContext context,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncMsg,
     QuestionsNotifier questionsNotifier,
     PageController pageController,
     TextEditingController textController,
@@ -66,22 +67,19 @@ class HomeScreen extends ScreenBase {
   ) async {
     pageController.jumpToPage(0);
     textController.clear();
-    await showFutureLoading(
-      context,
+    final List<Question?>? ret = await showFutureLoading(
+      loading,
+      asyncMsg,
       questionsNotifier.refreshQuestions(),
-      errorValue: <Question?>[],
-      errorMsg: 'データの取得に失敗しました。',
-      afterDialog: (context, ret) {
-        if (ret.isEmpty) {
-          showMsgBar(context, '質問が見つかりませんでした。');
-        }
-      },
+      message: 'データの取得に失敗しました。',
     );
+    if (ret != null && ret.isEmpty) asyncMsg.value = '質問が見つかりませんでした。';
     diff.value = 0;
   }
 
   Future<void> _reloadQuestions(
-    BuildContext context,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncMsg,
     QuestionsNotifier questionsNotifier,
     PageController pageController,
   ) async {
@@ -91,21 +89,33 @@ class HomeScreen extends ScreenBase {
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeInBack,
     );
-    await showFutureLoading(
-      context,
+    final List<Question?>? ret = await showFutureLoading(
+      loading,
+      asyncMsg,
       questionsNotifier.getQuestions(page),
-      errorValue: <Question?>[],
-      errorMsg: 'データの取得に失敗しました。',
-      afterDialog: (context, ret) {
-        if (ret.isEmpty) {
-          showMsgBar(context, '質問が見つかりませんでした。');
-        }
-      },
+      message: 'データの取得に失敗しました。',
     );
+    if (ret != null && ret.isEmpty) asyncMsg.value = '質問が見つかりませんでした。';
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ValueNotifier<bool> loading = useState(initLoading);
+    final ValueNotifier<String> asyncPath = useState('');
+    useEffect(() {
+      if (asyncPath.value.isNotEmpty) context.go(asyncPath.value);
+      return null;
+    }, [asyncPath.value]);
+    final ValueNotifier<String> asyncMsg = useState('');
+    useEffect(() {
+      if (asyncMsg.value.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showMsgBar(context, asyncMsg.value);
+        });
+      }
+      return null;
+    }, [asyncMsg.value]);
+
     final QuestionsNotifier questionsNotifier =
         ref.read(questionsProvider.notifier);
     final AsyncValue<UserData> myData = ref.watch(userStreamProvider);
@@ -122,7 +132,7 @@ class HomeScreen extends ScreenBase {
           if (asyncFuture.hasError) {
             return dispTemp(msg: 'データの取得に失敗しました。');
           } else if (asyncFuture.connectionState == ConnectionState.done) {
-            return userBuild(context, ref, data);
+            return userBuild(context, ref, data, loading, asyncPath, asyncMsg);
           } else {
             return loadingTemp();
           }
@@ -134,7 +144,9 @@ class HomeScreen extends ScreenBase {
   }
 
   void _listener(
-    BuildContext context,
+    double hieight,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncMsg,
     PageController pageController,
     TextEditingController textController,
     QuestionsNotifier questionsNotifier,
@@ -143,13 +155,13 @@ class HomeScreen extends ScreenBase {
   ) {
     if (pageController.hasClients) {
       final int page = pageController.page?.round() ?? 0;
-      final double position =
-          pageController.position.pixels / MediaQuery.of(context).size.height;
+      final double position = pageController.position.pixels / hieight;
       if (page == indexes.top) {
         final double diffValue = page - position;
         if (diffValue > 0.1 && diff.value <= 0.1) {
           _refreshQuestions(
-            context,
+            loading,
+            asyncMsg,
             questionsNotifier,
             pageController,
             textController,
@@ -161,7 +173,8 @@ class HomeScreen extends ScreenBase {
         final diffValue = position - page;
         if (diffValue > 0.1 && diff.value <= 0.1) {
           _reloadQuestions(
-            context,
+            loading,
+            asyncMsg,
             questionsNotifier,
             pageController,
           );
@@ -174,7 +187,14 @@ class HomeScreen extends ScreenBase {
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     final PageController pageController = usePageController();
     final TextEditingController textController = useTextEditingController();
     final QuestionsNotifier questionsNotifier =
@@ -186,7 +206,9 @@ class HomeScreen extends ScreenBase {
 
     useEffect(() {
       listener() => _listener(
-            context,
+            MediaQuery.of(context).size.height,
+            loading,
+            asyncMsg,
             pageController,
             textController,
             questionsNotifier,
@@ -198,6 +220,8 @@ class HomeScreen extends ScreenBase {
     }, [pageController, textController, questionsNotifier, indexes, diff]);
 
     return questionsTemp(
+      loading: loading.value,
+      asyncMsg: asyncMsg,
       myData: myData,
       pageController: pageController,
       questions: questions,
@@ -205,14 +229,16 @@ class HomeScreen extends ScreenBase {
       diff: diff.value,
       onPageChanged: (value) => _onPageChanged(value, indexesNotifier),
       refreshFunction: () => _refreshQuestions(
-        context,
+        loading,
+        asyncMsg,
         questionsNotifier,
         pageController,
         textController,
         diff,
       ),
       reloadFunciton: () => _reloadQuestions(
-        context,
+        loading,
+        asyncMsg,
         questionsNotifier,
         pageController,
       ),
@@ -228,7 +254,7 @@ class HomeScreen extends ScreenBase {
                 onPressed: () => Scaffold.of(context).openDrawer(),
                 style: IconButton.styleFrom(
                   foregroundColor: Colors.white,
-                  backgroundColor: Colors.white.withOpacity(0.2),
+                  backgroundColor: Colors.white24,
                 ),
               ),
               const SizedBox(width: 10),
@@ -238,7 +264,8 @@ class HomeScreen extends ScreenBase {
                   child: TextField(
                     controller: textController,
                     onSubmitted: (value) => _onSubmit(
-                      context,
+                      loading,
+                      asyncMsg,
                       value,
                       questionsNotifier,
                       pageController,
@@ -247,7 +274,7 @@ class HomeScreen extends ScreenBase {
                       fontSize: 16,
                       height: 1.3,
                     ),
-                    cursorColor: Colors.white.withOpacity(1),
+                    cursorColor: Colors.white,
                     decoration: InputDecoration(
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(
@@ -256,25 +283,25 @@ class HomeScreen extends ScreenBase {
                       ),
                       hintText: '検索',
                       hintStyle: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white70,
                         fontSize: 16,
                         height: 1.3,
                         fontWeight: FontWeight.w400,
                       ),
                       filled: true,
-                      fillColor: Colors.white.withOpacity(0.2),
+                      fillColor: Colors.white24,
                       suffixIcon: const Icon(Icons.search),
-                      suffixIconColor: Colors.white.withOpacity(0.8),
+                      suffixIconColor: Colors.white70,
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           width: 2,
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white60,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           width: 2,
-                          color: Colors.white.withOpacity(1),
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -293,7 +320,7 @@ class HomeScreen extends ScreenBase {
                 ),
                 style: IconButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: Colors.white.withOpacity(0.2),
+                  backgroundColor: Colors.white24,
                   foregroundColor: Colors.white,
                 ),
               ),

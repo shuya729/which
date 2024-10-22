@@ -1,4 +1,3 @@
-import { logger } from "firebase-functions/v2";
 import { Embedding } from "../models/embedding";
 import { Question } from "../models/question";
 import { Score } from "../models/score";
@@ -94,8 +93,6 @@ export const sortQuestions = (
     if (!scoreB) return -1;
     return scoreB.totalScore - scoreA.totalScore;
   });
-
-  logger.info("scoreMap", scoreMap);
 
   return questions;
 };

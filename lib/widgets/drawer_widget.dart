@@ -23,7 +23,7 @@ class DrawerWidget extends HookConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.only(bottom: 40),
         children: [
-          const DrawerHeader(
+          DrawerHeader(
             child: Center(
               child: Text(
                 'メニュー',

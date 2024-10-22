@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/utils/screen_base.dart';
@@ -18,19 +17,24 @@ class SignoutScreen extends ScreenBase {
 
   String get text => 'サインアウト';
   String get description => 'サインアウトしますか？\n一部の機能が使用できなくなります。';
-  String get errorMsg => 'サインアウトに失敗しました。';
+  String get errorMessage => 'サインアウトに失敗しました。';
 
-  void afterDialog(BuildContext context, _) {
-    if (context.mounted) context.go(HomeScreen.absolutePath);
-  }
-
-  Future<void> execute(BuildContext context) async {
+  Future<void> execute(ValueNotifier<String> asyncPath) async {
     await FirebaseAuth.instance.signOut();
+    asyncPath.value = HomeScreen.absolutePath;
   }
 
   @override
-  Widget userBuild(BuildContext context, WidgetRef ref, UserData myData) {
+  Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
     return textTemp(
+      loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return Column(
           children: [
@@ -41,11 +45,10 @@ class SignoutScreen extends ScreenBase {
               height: 33,
               child: OutlinedButton(
                 onPressed: () => showFutureLoading(
-                  context,
-                  execute(context),
-                  errorValue: null,
-                  errorMsg: errorMsg,
-                  afterDialog: afterDialog,
+                  loading,
+                  asyncMsg,
+                  execute(asyncPath),
+                  message: errorMessage,
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.black,

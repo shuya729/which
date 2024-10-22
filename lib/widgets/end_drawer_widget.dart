@@ -70,7 +70,7 @@ class EndDrawerWidget extends HookConsumerWidget {
           endIndent: 10,
           height: 20,
           thickness: 1.6,
-          color: Colors.black.withOpacity(0.6),
+          color: Colors.black54,
         ),
       );
       tiles.add(

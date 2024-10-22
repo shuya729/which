@@ -9,15 +9,20 @@ import 'package:which/models/question_id.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/models/vote.dart';
 import 'package:which/services/firestore_service.dart';
-import 'package:which/utils/screen_base.dart';
 import 'package:which/widgets/bottom_sheet_widget.dart';
 import 'package:which/widgets/center_widget.dart';
 import 'package:which/widgets/side_widget.dart';
 
-class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
-  const WhichWidget({super.key, required this.myData, required this.question});
+class WhichWidget extends HookConsumerWidget {
+  const WhichWidget({
+    super.key,
+    required this.myData,
+    required this.question,
+    required this.asyncMsg,
+  });
   final UserData myData;
   final Question question;
+  final ValueNotifier<String> asyncMsg;
 
   Future<void> _init() async {
     final FirestoreService firestoreService = FirestoreService();
@@ -29,7 +34,6 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
   }
 
   Future<void> _onPageChanged(
-    BuildContext context,
     int value,
     ValueNotifier<int> vote,
   ) async {
@@ -45,7 +49,7 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
     if (value == 2) vote.value = 1;
     final Vote? voted = await firestoreService.getVoted(myData, question);
     if (voted != null) return;
-    if (context.mounted) await _addVote(context, vote.value);
+    await _addVote(vote.value);
     await _voteQuestion(vote.value);
   }
 
@@ -67,21 +71,21 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
     return await firestoreService.getUser(question.authId);
   }
 
-  Future<void> _saveQuestion(BuildContext context, bool asyncSaved) async {
+  Future<void> _saveQuestion(bool asyncSaved) async {
     final FirestoreService firestoreService = FirestoreService();
     if (myData.anonymousFlg) {
-      showMsgBar(context, 'ログインが必要です。');
+      asyncMsg.value = 'ログインが必要です。';
       return;
     } else if (asyncSaved) {
       await firestoreService.deleteSaved(myData, question).catchError(
         (_) {
-          if (context.mounted) showMsgBar(context, '保存解除に失敗しました。');
+          asyncMsg.value = '保存解除に失敗しました。';
         },
       );
     } else {
       await firestoreService.setSaved(myData, question).catchError(
         (_) {
-          if (context.mounted) showMsgBar(context, '保存に失敗しました。');
+          asyncMsg.value = '保存に失敗しました。';
         },
       );
     }
@@ -105,11 +109,11 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
     }
   }
 
-  Future<void> _addVote(BuildContext context, int vote) async {
+  Future<void> _addVote(int vote) async {
     final FirestoreService firestoreService = FirestoreService();
     await firestoreService.setVoted(myData, question, vote).catchError(
       (_) {
-        if (context.mounted) showMsgBar(context, '回答に失敗しました。');
+        asyncMsg.value = '回答に失敗しました。';
       },
     );
   }
@@ -128,7 +132,7 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
       context: context,
       useSafeArea: true,
       showDragHandle: true,
-      backgroundColor: Colors.blueGrey.shade50,
+      backgroundColor: Colors.grey.shade100,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(15),
@@ -136,7 +140,11 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
         ),
       ),
       builder: (context) {
-        return BottomSheetWidget(myData: myData, question: question);
+        return BottomSheetWidget(
+          myData: myData,
+          question: question,
+          asyncMsg: asyncMsg,
+        );
       },
     );
   }
@@ -169,7 +177,7 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
         PageView(
           scrollDirection: Axis.horizontal,
           controller: pageController,
-          onPageChanged: (value) => _onPageChanged(context, value, vote),
+          onPageChanged: (value) => _onPageChanged(value, vote),
           children: [
             SideWidget(
               myData: myData,
@@ -229,10 +237,7 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
                           asyncQuestion.quest,
                           textAlign: TextAlign.center,
                           minFontSize: 10,
-                          style: const TextStyle(
-                            fontSize: 26,
-                            color: Colors.black,
-                          ),
+                          style: const TextStyle(fontSize: 26),
                         ),
                       ),
                     ),
@@ -258,10 +263,9 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
                                   onPressed: null,
                                   icon: CircleAvatar(
                                     radius: 20,
-                                    backgroundColor:
-                                        Colors.black.withOpacity(0.6),
+                                    backgroundColor: Colors.black45,
                                     child: CircleAvatar(
-                                      radius: 18.4,
+                                      radius: 18,
                                       backgroundColor: Colors.white,
                                       foregroundImage: asyncUser.image.isEmpty
                                           ? const AssetImage(
@@ -283,14 +287,14 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
                                           color: Colors.black,
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: 6),
                                       Text(
                                         '${asyncQuestion.creAt.year}/${asyncQuestion.creAt.month}/${asyncQuestion.creAt.day}',
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 12,
                                           height: 1,
-                                          color: Colors.black.withOpacity(0.6),
+                                          color: Colors.black87,
                                         ),
                                       ),
                                     ],
@@ -304,8 +308,7 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
                                     ),
                                     minimumSize: const Size(150, 54),
                                     maximumSize: const Size(300, 54),
-                                    backgroundColor:
-                                        Colors.white.withOpacity(0.2),
+                                    backgroundColor: Colors.white24,
                                     foregroundColor: Colors.white,
                                     fixedSize:
                                         Size(constraints.maxWidth * 0.45, 54),
@@ -328,7 +331,7 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
+                                        color: Colors.white24,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: const Text(
@@ -342,16 +345,14 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed: () =>
-                                        _saveQuestion(context, asyncSaved),
+                                    onPressed: () => _saveQuestion(asyncSaved),
                                     icon: Icon(
                                       asyncSaved
                                           ? Icons.bookmark
                                           : Icons.bookmark_outline,
                                     ),
                                     style: IconButton.styleFrom(
-                                      backgroundColor:
-                                          Colors.white.withOpacity(0.2),
+                                      backgroundColor: Colors.white24,
                                       foregroundColor: Colors.white,
                                     ),
                                   ),
@@ -370,8 +371,7 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
                                     },
                                     icon: const Icon(Icons.ios_share),
                                     style: IconButton.styleFrom(
-                                      backgroundColor:
-                                          Colors.white.withOpacity(0.2),
+                                      backgroundColor: Colors.white24,
                                       foregroundColor: Colors.white,
                                     ),
                                   ),
@@ -379,8 +379,7 @@ class WhichWidget extends HookConsumerWidget with ScreenBaseFunction {
                                     onPressed: () => _showBottomSheet(context),
                                     icon: const Icon(Icons.more_vert),
                                     style: IconButton.styleFrom(
-                                      backgroundColor:
-                                          Colors.white.withOpacity(0.2),
+                                      backgroundColor: Colors.white24,
                                       foregroundColor: Colors.white,
                                     ),
                                   ),

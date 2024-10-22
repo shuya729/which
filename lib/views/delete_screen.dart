@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:which/views/home_screen.dart';
 import 'package:which/views/signout_screen.dart';
@@ -21,11 +19,9 @@ class DeleteScreen extends SignoutScreen {
   @override
   String get description => 'アカウントを削除しますか？\n全てのデータが削除されます。';
   @override
-  void afterDialog(BuildContext context, _) {
-    if (context.mounted) context.go(HomeScreen.absolutePath);
-  }
+  String get errorMessage => 'アカウント削除に失敗しました。';
 
-  Future<void> _getGoogle(BuildContext context) async {
+  Future<bool> _getGoogle() async {
     if (kIsWeb) {
       final GoogleAuthProvider googleProvider = GoogleAuthProvider();
       googleProvider
@@ -33,69 +29,61 @@ class DeleteScreen extends SignoutScreen {
       googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
       googleProvider
           .addScope('https://www.googleapis.com/auth/userinfo.profile');
-      await _continueWithProvider(context, googleProvider);
+      return await _continueWithProvider(googleProvider);
     } else {
       final GoogleSignInAccount? googleUser =
           await GoogleSignIn(scopes: ['email', 'profile']).signInSilently();
-      if (googleUser == null) return;
+      if (googleUser == null) return false;
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      if (context.mounted) await _continueWithCredential(context, credential);
+      return await _continueWithCredential(credential);
     }
   }
 
-  Future<void> _getApple(BuildContext context) async {
+  Future<bool> _getApple() async {
     final AppleAuthProvider appleProvider = AppleAuthProvider();
     appleProvider.addScope('email');
     appleProvider.addScope('name');
-    await _continueWithProvider(context, appleProvider);
+    return await _continueWithProvider(appleProvider);
   }
 
-  Future<void> _continueWithCredential(
-    BuildContext context,
-    OAuthCredential credential,
-  ) async {
+  Future<bool> _continueWithCredential(OAuthCredential credential) async {
     final User? currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) {
-      if (context.mounted) showMsgBar(context, 'アカウント削除に失敗しました。');
-    } else {
-      await currentUser.reauthenticateWithCredential(credential);
-      await currentUser.delete();
-    }
+    if (currentUser == null) throw Exception();
+    await currentUser.reauthenticateWithCredential(credential);
+    await currentUser.delete();
+    return true;
   }
 
-  Future<void> _continueWithProvider(
-    BuildContext context,
-    AuthProvider provider,
-  ) async {
+  Future<bool> _continueWithProvider(AuthProvider provider) async {
     final User? currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) {
-      if (context.mounted) showMsgBar(context, 'アカウント削除に失敗しました。');
+    if (currentUser == null) throw Exception();
+    if (kIsWeb) {
+      await currentUser.reauthenticateWithPopup(provider);
     } else {
-      if (kIsWeb) {
-        await currentUser.reauthenticateWithPopup(provider);
-      } else {
-        await currentUser.reauthenticateWithProvider(provider);
-      }
-      await currentUser.delete();
+      await currentUser.reauthenticateWithProvider(provider);
     }
+    await currentUser.delete();
+    return true;
   }
 
   @override
-  Future<void> execute(BuildContext context) async {
+  Future<void> execute(ValueNotifier<String> asyncPath) async {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      if (context.mounted) showMsgBar(context, 'アカウント削除に失敗しました。');
+      throw Exception();
     } else if (user.providerData[0].providerId == 'google.com') {
-      await _getGoogle(context);
+      final bool ret = await _getGoogle();
+      if (ret) asyncPath.value = HomeScreen.absolutePath;
     } else if (user.providerData[0].providerId == 'apple.com') {
-      await _getApple(context);
+      final bool ret = await _getApple();
+      if (ret) asyncPath.value = HomeScreen.absolutePath;
     } else {
-      if (context.mounted) showMsgBar(context, 'アカウント削除に失敗しました。');
+      throw Exception();
     }
   }
 }

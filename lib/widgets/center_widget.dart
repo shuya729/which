@@ -110,7 +110,7 @@ class CenterWidget extends HookConsumerWidget {
                           iconSize: 20,
                           style: IconButton.styleFrom(
                             visualDensity: VisualDensity.compact,
-                            foregroundColor: Colors.white.withOpacity(0.8),
+                            foregroundColor: Colors.white70,
                           ),
                         ),
                         IconButton(
@@ -122,7 +122,7 @@ class CenterWidget extends HookConsumerWidget {
                           iconSize: 20,
                           style: IconButton.styleFrom(
                             visualDensity: VisualDensity.compact,
-                            foregroundColor: Colors.white.withOpacity(0.8),
+                            foregroundColor: Colors.white70,
                           ),
                         ),
                       ],

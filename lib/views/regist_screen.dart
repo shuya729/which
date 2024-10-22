@@ -20,33 +20,32 @@ class RegistScreen extends SigninScreen {
   @override
   String get other => 'サインイン';
   @override
-  String get errorMsg => 'サインアップに失敗しました。';
-  @override
   Future<void> toOther(BuildContext context) async {
     await context.push(SigninScreen.absolutePath);
   }
 
   @override
-  void afterDialog(BuildContext context, _) {
-    if (context.mounted) context.go(SetupScreen.absolutePath);
+  void nextPage(ValueNotifier<String> asyncPath) {
+    asyncPath.value = SetupScreen.absolutePath;
   }
 
   @override
-  Future<void> continueWithCredential(
-    BuildContext context,
+  Future<bool> continueWithCredential(
+    ValueNotifier<String> asyncMsg,
     OAuthCredential credential,
   ) async {
     try {
       final User? currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
-        if (context.mounted) showMsgBar(context, 'サインアップに失敗しました。');
+        throw Exception();
       } else {
         await currentUser.linkWithCredential(credential);
+        return true;
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'credential-already-in-use') {
-        if (context.mounted) showMsgBar(context, 'このアカウントは既に登録されています。');
-        throw 'unnotified-error';
+        asyncMsg.value = 'このアカウントは既に登録されています。';
+        return false;
       } else {
         rethrow;
       }
@@ -56,25 +55,26 @@ class RegistScreen extends SigninScreen {
   }
 
   @override
-  Future<void> continueWithProvider(
-    BuildContext context,
+  Future<bool> continueWithProvider(
+    ValueNotifier<String> asyncMsg,
     AuthProvider provider,
   ) async {
     try {
       final User? currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
-        if (context.mounted) showMsgBar(context, 'サインアップに失敗しました。');
+        throw Exception();
       } else {
         if (kIsWeb) {
           await currentUser.linkWithPopup(provider);
         } else {
           await currentUser.linkWithProvider(provider);
         }
+        return true;
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'credential-already-in-use') {
-        if (context.mounted) showMsgBar(context, 'このアカウントは既に登録されています。');
-        throw 'unnotified-error';
+        asyncMsg.value = 'このアカウントは既に登録されています。';
+        return false;
       } else {
         rethrow;
       }
