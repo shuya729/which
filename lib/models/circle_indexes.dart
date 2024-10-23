@@ -44,7 +44,7 @@ class CircleIndexes extends Indexes {
   }
 
   @override
-  CircleIndexes changePage(int value) {
+  CircleIndexes changePage(final int value) {
     return copyWith(current: value, multiplier: value ~/ limit);
   }
 
@@ -56,7 +56,7 @@ class CircleIndexes extends Indexes {
 
   @override
   CircleIndexes loaded(int length) {
-    if (top == 0 && bottom == 0) length--;
+    if (top == 0 && bottom == 0 && length > 0) length--;
     int? load;
     if (length > loadCount) load = bottom + length - loadCount;
     return copyWith(bottom: bottom + length, load: load);
@@ -71,7 +71,7 @@ class CircleIndexes extends Indexes {
   }
 
   @override
-  bool hasPage(int page) {
+  bool hasPage(final int page) {
     final int topPage = top <= current
         ? top + multiplier * limit
         : top + (multiplier - 1) * limit;
@@ -82,7 +82,7 @@ class CircleIndexes extends Indexes {
   }
 
   @override
-  int pageIndex(int page) {
+  int pageIndex(final int page) {
     return page % limit;
   }
 

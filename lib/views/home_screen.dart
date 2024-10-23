@@ -30,9 +30,7 @@ class HomeScreen extends ScreenBase {
   ) async {
     try {
       await indexesNotifier.changePage(value);
-    } catch (e) {
-      print('onGetQuestions: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> _onSubmit(

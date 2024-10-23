@@ -25,21 +25,30 @@ class UserData {
   final DateTime creAt;
   final DateTime updAt;
 
-  factory UserData.init({
-    required String authId,
-    required bool isAnonymous,
-  }) {
-    return UserData(
-      authId: authId,
-      userId: authId,
-      name: '',
-      image: '',
-      anonymousFlg: isAnonymous,
-      deletedFlg: false,
-      rejectedFlg: false,
-      creAt: DateTime.now(),
-      updAt: DateTime.now(),
-    );
+  static Map<String, dynamic> forSet(String authId, bool isAnonymous) {
+    return <String, dynamic>{
+      'authId': authId,
+      'userId': authId,
+      'name': '',
+      'image': '',
+      'anonymousFlg': isAnonymous,
+      'deletedFlg': false,
+      'rejectedFlg': false,
+      'creAt': FieldValue.serverTimestamp(),
+      'updAt': FieldValue.serverTimestamp(),
+    };
+  }
+
+  Map<String, dynamic> forUpdate(
+    String? name,
+    String? image,
+    bool? anonymousFlg,
+  ) {
+    final Map<String, dynamic> data = {'updAt': FieldValue.serverTimestamp()};
+    if (name != null) data['name'] = name;
+    if (image != null) data['image'] = image;
+    if (anonymousFlg != null) data['anonymousFlg'] = anonymousFlg;
+    return data;
   }
 
   // fromFirestore
@@ -55,21 +64,6 @@ class UserData {
       creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updAt: (data['updAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
-  }
-
-  // toFirestore
-  Map<String, dynamic> toFirestore() {
-    return <String, dynamic>{
-      'authId': authId,
-      'userId': userId,
-      'name': name,
-      'image': image,
-      'anonymousFlg': anonymousFlg,
-      'deletedFlg': deletedFlg,
-      'rejectedFlg': rejectedFlg,
-      'creAt': creAt,
-      'updAt': updAt,
-    };
   }
 
   // copyWith

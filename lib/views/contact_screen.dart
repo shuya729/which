@@ -3,9 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:which/models/contact.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/services/firestore_service.dart';
+import 'package:which/services/contact_service.dart';
 import 'package:which/utils/screen_base.dart';
 
 class ContactScreen extends ScreenBase {
@@ -24,14 +23,13 @@ class ContactScreen extends ScreenBase {
     required TextEditingController contentController,
     required ValueNotifier<String> asyncMsg,
   }) async {
-    final Contact contact = Contact.init(
-      authId: myData.authId,
+    await ContactService().set(
+      userData: myData,
       name: nameController.text,
       email: emailController.text,
       subject: subjectValue.value,
       content: contentController.text,
     );
-    await FirestoreService().addContact(contact);
     nameController.text = myData.name;
     emailController.clear();
     contentController.clear();

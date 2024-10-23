@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/color_set.dart';
 import 'package:which/models/question.dart';
@@ -23,13 +22,21 @@ class SideWidget extends HookConsumerWidget {
   final PageController pageController;
   final bool voted;
 
+  String _rateStr(Question question) {
+    final int count = isLeft ? question.answer2Count : question.answer1Count;
+    final int total = question.answer1Count + question.answer2Count;
+    if (count == total) return '100';
+    return (count / total * 100).toStringAsFixed(1);
+  }
+
+  String _countStr(Question question) {
+    final int count = isLeft ? question.answer2Count : question.answer1Count;
+    return '$count p';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final Color backColor = isLeft ? colorSet.leftColor : colorSet.rightColor;
-    final ValueNotifier<int> count =
-        useState(isLeft ? question.answer2Count : question.answer1Count);
-    final ValueNotifier<int> total =
-        useState(question.answer1Count + question.answer2Count);
     return Container(
       color: backColor,
       child: SafeArea(
@@ -118,10 +125,7 @@ class SideWidget extends HookConsumerWidget {
                                 maxHeight: constraints.maxHeight * 0.15,
                               ),
                               child: AutoSizeText(
-                                count.value == total.value
-                                    ? '100'
-                                    : (count.value / total.value * 100)
-                                        .toStringAsFixed(1),
+                                _rateStr(question),
                                 minFontSize: 30,
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
@@ -164,7 +168,7 @@ class SideWidget extends HookConsumerWidget {
                           ),
                           alignment: Alignment.topCenter,
                           child: AutoSizeText(
-                            '${count.value} p',
+                            _countStr(question),
                             minFontSize: 10,
                             textAlign: TextAlign.center,
                             maxLines: 1,

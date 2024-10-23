@@ -45,24 +45,6 @@ class Comment {
       updAt: (data['updAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
-
-  // toFirestore
-  Map<String, dynamic> toFirestore() {
-    return <String, dynamic>{
-      'commentId': commentId,
-      'tgtQuestionId': tgtQuestionId,
-      'tgtAnswer': tgtAnswer,
-      'authId': authId,
-      'comment': comment,
-      'likeCount': likeCount,
-      'editedFlg': editedFlg,
-      'deletedFlg': deletedFlg,
-      'rejectedFlg': rejectedFlg,
-      'creAt': creAt,
-      'updAt': updAt,
-    };
-  }
-
   // copyWith
   Comment copyWith({
     String? commentId,

@@ -15,17 +15,17 @@ class Vote {
   final int vote;
   final DateTime creAt;
 
-  factory Vote.init({
-    required String questionId,
-    required String authId,
-    required int vote,
-  }) {
-    return Vote(
-      questionId: questionId,
-      authId: authId,
-      vote: vote,
-      creAt: DateTime.now(),
-    );
+  static Map<String, dynamic> forSet(
+    String questionId,
+    String authId,
+    int vote,
+  ) {
+    return <String, dynamic>{
+      'questionId': questionId,
+      'authId': authId,
+      'vote': vote,
+      'creAt': FieldValue.serverTimestamp(),
+    };
   }
 
   factory Vote.fromFirestore(Map<String, dynamic> data) {
@@ -35,15 +35,6 @@ class Vote {
       vote: data['vote'] as int? ?? 0,
       creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
-  }
-
-  Map<String, dynamic> toFirestore() {
-    return <String, dynamic>{
-      'questionId': questionId,
-      'authId': authId,
-      'vote': vote,
-      'creAt': creAt,
-    };
   }
 
   // copyWith

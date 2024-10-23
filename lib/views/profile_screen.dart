@@ -5,8 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/services/firestore_service.dart';
 import 'package:which/services/storage_service.dart';
+import 'package:which/services/user_service.dart';
 import 'package:which/utils/screen_base.dart';
 
 class ProfileScreen extends ScreenBase {
@@ -33,7 +33,7 @@ class ProfileScreen extends ScreenBase {
     required ValueNotifier<Uint8List?> imageData,
   }) async {
     final StorageService storageService = StorageService();
-    final FirestoreService firestoreService = FirestoreService();
+    final UserService userService = UserService();
     final String? name = nameController.text.trim() == myData.name
         ? null
         : nameController.text.trim();
@@ -41,7 +41,7 @@ class ProfileScreen extends ScreenBase {
     final String? imageUrl = image == null
         ? null
         : await storageService.putIcon(myData.authId, image);
-    await firestoreService.updateProfile(myData, name, imageUrl);
+    await userService.update(myData, name: name, image: imageUrl);
     imageData.value = null;
     asyncMsg.value = 'プロフィールを更新しました。';
   }

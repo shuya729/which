@@ -6,9 +6,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/color_set.dart';
-import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/services/firestore_service.dart';
+import 'package:which/services/question_service.dart';
 import 'package:which/utils/screen_base.dart';
 
 class CreateScreen extends ScreenBase {
@@ -19,7 +18,7 @@ class CreateScreen extends ScreenBase {
   static const String absolutePath = '/create';
   static const String relativePath = 'create';
 
-  Future<Question?> _post({
+  Future<void> _post({
     required BuildContext context,
     required UserData myData,
     required GlobalKey<FormState> formKey,
@@ -30,15 +29,13 @@ class CreateScreen extends ScreenBase {
     final questValue = questController.text.trim();
     final answer1Vlaue = answer1Controller.text.trim();
     final answer2Value = answer2Controller.text.trim();
-    Question question = Question.crate(
-      authId: myData.authId,
+    await QuestionService().add(
+      userData: myData,
       quest: questValue,
       answer1: answer1Vlaue,
       answer2: answer2Value,
     );
-    await FirestoreService().addQuestion(question);
     if (context.mounted) context.pop();
-    return question;
   }
 
   @override

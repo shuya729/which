@@ -37,29 +37,44 @@ class Question {
   final DateTime creAt;
   final DateTime updAt;
 
-  factory Question.crate({
-    required String authId,
-    required String quest,
-    required String answer1,
-    required String answer2,
+  static Map<String, dynamic> forSet(
+    String questionId,
+    String authId,
+    String quest,
+    String answer1,
+    String answer2,
+  ) {
+    return <String, dynamic>{
+      'questionId': questionId,
+      'authId': authId,
+      'quest': quest,
+      'answer1': answer1,
+      'answer2': answer2,
+      'readCount': 0,
+      'watchCount': 0,
+      'answer1Count': 0,
+      'answer2Count': 0,
+      'editedFlg': false,
+      'hiddenFlg': false,
+      'deletedFlg': false,
+      'rejectedFlg': false,
+      'creAt': FieldValue.serverTimestamp(),
+      'updAt': FieldValue.serverTimestamp(),
+    };
+  }
+
+  Map<String, dynamic> forUpdate({
+    bool incrementRead = false,
+    bool incrementWatch = false,
+    bool incrementAnswer1 = false,
+    bool incrementAnswer2 = false,
   }) {
-    return Question(
-      questionId: '',
-      authId: authId,
-      quest: quest,
-      answer1: answer1,
-      answer2: answer2,
-      readCount: 0,
-      watchCount: 0,
-      answer1Count: 0,
-      answer2Count: 0,
-      editedFlg: false,
-      hiddenFlg: false,
-      deletedFlg: false,
-      rejectedFlg: false,
-      creAt: DateTime.now(),
-      updAt: DateTime.now(),
-    );
+    final Map<String, dynamic> data = {'updAt': FieldValue.serverTimestamp()};
+    if (incrementRead) data['readCount'] = FieldValue.increment(1);
+    if (incrementWatch) data['watchCount'] = FieldValue.increment(1);
+    if (incrementAnswer1) data['answer1Count'] = FieldValue.increment(1);
+    if (incrementAnswer2) data['answer2Count'] = FieldValue.increment(1);
+    return data;
   }
 
   // fromMap(fromJson)
@@ -106,32 +121,6 @@ class Question {
       creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updAt: (data['updAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
-  }
-
-  // toFirestore
-  Map<String, dynamic> toFirestore({
-    bool incrementRead = false,
-    bool incrementWatch = false,
-    bool incrementAnswer1 = false,
-    bool incrementAnswer2 = false,
-  }) {
-    return <String, dynamic>{
-      'questionId': questionId,
-      'authId': authId,
-      'quest': quest,
-      'answer1': answer1,
-      'answer2': answer2,
-      'readCount': incrementRead ? FieldValue.increment(1) : readCount,
-      'watchCount': incrementWatch ? FieldValue.increment(1) : watchCount,
-      'answer1Count': incrementAnswer1 ? FieldValue.increment(1) : answer1Count,
-      'answer2Count': incrementAnswer2 ? FieldValue.increment(1) : answer2Count,
-      'editedFlg': editedFlg,
-      'hiddenFlg': hiddenFlg,
-      'deletedFlg': deletedFlg,
-      'rejectedFlg': rejectedFlg,
-      'creAt': creAt,
-      'updAt': updAt,
-    };
   }
 
   // copyWith

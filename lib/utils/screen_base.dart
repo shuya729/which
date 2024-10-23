@@ -413,8 +413,7 @@ abstract class ScreenBase extends HookConsumerWidget {
                               if (indexes.current == indexes.top) {
                                 refreshFunction();
                               } else {
-                                pageController.animateToPage(
-                                  indexes.current - 1,
+                                pageController.previousPage(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
                                 );
@@ -454,8 +453,7 @@ abstract class ScreenBase extends HookConsumerWidget {
                               if (indexes.current == indexes.bottom) {
                                 reloadFunciton();
                               } else {
-                                pageController.animateToPage(
-                                  indexes.current + 1,
+                                pageController.nextPage(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
                                 );

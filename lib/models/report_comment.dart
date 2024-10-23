@@ -16,17 +16,6 @@ class ReportComment {
   final String tgtCommentId;
   final DateTime creAt;
 
-  // toFirestore
-  Map<String, dynamic> toFirestore() {
-    return <String, dynamic>{
-      'authId': authId,
-      'tgtQuestionId': tgtQuestionId,
-      'tgtAnswer': tgtAnswer,
-      'tgtCommentId': tgtCommentId,
-      'creAt': creAt,
-    };
-  }
-
   // hashCode
   @override
   int get hashCode =>

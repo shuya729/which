@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -12,12 +13,11 @@ class ReportQuestion {
   final String questionId;
   final DateTime creAt;
 
-  // toFirestore
-  Map<String, dynamic> toFirestore() {
+  static Map<String, dynamic> forSet(String authId, String questionId) {
     return <String, dynamic>{
       'authId': authId,
       'questionId': questionId,
-      'creAt': creAt,
+      'creAt': FieldValue.serverTimestamp(),
     };
   }
 

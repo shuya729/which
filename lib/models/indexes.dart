@@ -42,7 +42,7 @@ class Indexes {
 
   // loaded
   Indexes loaded(int length) {
-    if (top == 0 && bottom == 0) length--;
+    if (top == 0 && bottom == 0 && length > 0) length--;
     int? load;
     if (length > loadCount) load = bottom + length - loadCount;
     return copyWith(bottom: bottom + length, load: load);

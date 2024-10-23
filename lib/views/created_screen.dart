@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/indexes.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/services/firestore_service.dart';
+import 'package:which/services/question_service.dart';
 import 'package:which/utils/screen_base.dart';
 
 class CreatedScreen extends ScreenBase {
@@ -27,8 +27,10 @@ class CreatedScreen extends ScreenBase {
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
-    final FirestoreService firestoreService = FirestoreService();
-    final List<Question> createds = await firestoreService.getCreateds(myData);
+    final QuestionService questionService = QuestionService();
+    final List<Question> createds = await questionService.getCreateds(
+      userData: myData,
+    );
     questions.value = [...createds];
     indexes.value = indexes.value.loaded(createds.length);
     return createds;
@@ -45,9 +47,7 @@ class CreatedScreen extends ScreenBase {
       if (indexes.value.canLoad()) {
         await getQuestions(myData, questions, indexes);
       }
-    } catch (e) {
-      print('onGetQuestions: $e');
-    }
+    } catch (_) {}
   }
 
   Future<List<Question?>> getQuestions(
@@ -56,9 +56,11 @@ class CreatedScreen extends ScreenBase {
     ValueNotifier<Indexes> indexes,
   ) async {
     indexes.value = indexes.value.loading();
-    final FirestoreService firestoreService = FirestoreService();
-    final List<Question> createds =
-        await firestoreService.getCreateds(myData, last: questions.value.last);
+    final QuestionService questionService = QuestionService();
+    final List<Question> createds = await questionService.getCreateds(
+      userData: myData,
+      last: questions.value.last,
+    );
     final List<Question?> preQuestions = questions.value;
     for (Question question in createds) {
       if (preQuestions.contains(question)) createds.remove(question);
@@ -93,8 +95,10 @@ class CreatedScreen extends ScreenBase {
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
-    final FirestoreService firestoreService = FirestoreService();
-    final List<Question> createds = await firestoreService.getCreateds(myData);
+    final QuestionService questionService = QuestionService();
+    final List<Question> createds = await questionService.getCreateds(
+      userData: myData,
+    );
     questions.value = [...createds];
     indexes.value = Indexes().loaded(createds.length);
     return createds;

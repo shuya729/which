@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -20,27 +21,14 @@ class Contact {
   final String content;
   final DateTime creAt;
 
-  // init
-  factory Contact.init({
-    required String authId,
-    required String name,
-    required String email,
-    required int subject,
-    required String content,
-  }) {
-    return Contact(
-      contactId: '',
-      authId: authId,
-      name: name,
-      email: email,
-      subject: subject,
-      content: content,
-      creAt: DateTime.now(),
-    );
-  }
-
-  // toFirestore
-  Map<String, dynamic> toFirestore() {
+  static Map<String, dynamic> forSet(
+    String contactId,
+    String authId,
+    String name,
+    String email,
+    int subject,
+    String content,
+  ) {
     return <String, dynamic>{
       'contactId': contactId,
       'authId': authId,
@@ -48,7 +36,7 @@ class Contact {
       'email': email,
       'subject': subject,
       'content': content,
-      'creAt': creAt,
+      'creAt': FieldValue.serverTimestamp(),
     };
   }
 

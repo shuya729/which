@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:which/models/indexes.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/services/firestore_service.dart';
+import 'package:which/services/saved_service.dart';
 import 'package:which/views/created_screen.dart';
 
 class SavedScreen extends CreatedScreen {
@@ -21,8 +21,10 @@ class SavedScreen extends CreatedScreen {
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
-    final FirestoreService firestoreService = FirestoreService();
-    final List<Question> saveds = await firestoreService.getSaveds(myData);
+    final SavedService savedService = SavedService();
+    final List<Question> saveds = await savedService.getSaveds(
+      userData: myData,
+    );
     questions.value = [...saveds];
     indexes.value = indexes.value.loaded(saveds.length);
     return saveds;
@@ -35,9 +37,11 @@ class SavedScreen extends CreatedScreen {
     ValueNotifier<Indexes> indexes,
   ) async {
     indexes.value = indexes.value.loading();
-    final FirestoreService firestoreService = FirestoreService();
-    final List<Question> saveds =
-        await firestoreService.getSaveds(myData, last: questions.value.last);
+    final SavedService savedService = SavedService();
+    final List<Question> saveds = await savedService.getSaveds(
+      userData: myData,
+      last: questions.value.last,
+    );
     final List<Question?> preQuestions = questions.value;
     for (Question question in saveds) {
       if (preQuestions.contains(question)) saveds.remove(question);
@@ -53,8 +57,10 @@ class SavedScreen extends CreatedScreen {
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
-    final FirestoreService firestoreService = FirestoreService();
-    final List<Question> saveds = await firestoreService.getSaveds(myData);
+    final SavedService savedService = SavedService();
+    final List<Question> saveds = await savedService.getSaveds(
+      userData: myData,
+    );
     questions.value = [...saveds];
     indexes.value = Indexes().loaded(saveds.length);
     return saveds;

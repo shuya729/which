@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/services/firestore_service.dart';
+import 'package:which/services/question_service.dart';
+import 'package:which/services/report_question_service.dart';
 
 class BottomSheetWidget extends HookConsumerWidget {
   const BottomSheetWidget({
@@ -17,24 +18,25 @@ class BottomSheetWidget extends HookConsumerWidget {
 
   Future<void> _reportQuestion(BuildContext context) async {
     Navigator.of(context).pop();
-    final FirestoreService firestoreService = FirestoreService();
-    await firestoreService.reportQuestion(myData, question).catchError(
-      (_) {
-        asyncMsg.value = '投稿の報告に失敗しました。';
-      },
-    );
-    asyncMsg.value = '投稿を報告しました。';
+    try {
+      final ReportQuestionService reportQuestionService =
+          ReportQuestionService();
+      await reportQuestionService.set(userData: myData, question: question);
+      asyncMsg.value = '投稿を報告しました。';
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
+    }
   }
 
   Future<void> _deleteQuestion(BuildContext context) async {
     Navigator.of(context).pop();
-    final FirestoreService firestoreService = FirestoreService();
-    await firestoreService.deleteQuestion(question).catchError(
-      (_) {
-        asyncMsg.value = '投稿の削除に失敗しました。';
-      },
-    );
-    asyncMsg.value = '投稿を削除しました。';
+    try {
+      final QuestionService questionService = QuestionService();
+      await questionService.delete(question);
+      asyncMsg.value = '投稿を削除しました。';
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
+    }
   }
 
   // Future<void> _test(BuildContext context) async {

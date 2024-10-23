@@ -22,15 +22,6 @@ class UserId {
     );
   }
 
-  // toFirestore
-  Map<String, dynamic> toFirestore() {
-    return <String, dynamic>{
-      'userId': userId,
-      'authId': authId,
-      'creAt': creAt,
-    };
-  }
-
   // copyWith
   UserId copyWith({
     String? userId,

@@ -8,7 +8,12 @@ import 'package:which/models/question.dart';
 import 'package:which/models/question_id.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/models/vote.dart';
-import 'package:which/services/firestore_service.dart';
+import 'package:which/services/question_service.dart';
+import 'package:which/services/readed_service.dart';
+import 'package:which/services/saved_service.dart';
+import 'package:which/services/user_service.dart';
+import 'package:which/services/voted_service.dart';
+import 'package:which/services/watched_service.dart';
 import 'package:which/widgets/bottom_sheet_widget.dart';
 import 'package:which/widgets/center_widget.dart';
 import 'package:which/widgets/side_widget.dart';
@@ -25,105 +30,133 @@ class WhichWidget extends HookConsumerWidget {
   final ValueNotifier<String> asyncMsg;
 
   Future<void> _init() async {
-    final FirestoreService firestoreService = FirestoreService();
-    final QuestionId? readed =
-        await firestoreService.getReaded(myData, question);
-    await firestoreService.setReaded(myData, question);
-    if (readed != null) return;
-    await firestoreService.updateQuestion(question, incrementRead: true);
+    try {
+      final QuestionService questionService = QuestionService();
+      final ReadedService readedService = ReadedService();
+      final QuestionId? readed = await readedService.get(
+        userData: myData,
+        question: question,
+      );
+      await readedService.set(userData: myData, question: question);
+      if (readed != null) return;
+      await questionService.update(question, incrementRead: true);
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
+    }
   }
 
   Future<void> _onPageChanged(
     int value,
     ValueNotifier<int> vote,
   ) async {
-    final FirestoreService firestoreService = FirestoreService();
-    final QuestionId? watched =
-        await firestoreService.getWatched(myData, question);
-    await firestoreService.setWatched(myData, question);
-    if (watched != null) return;
-    await firestoreService.updateQuestion(question, incrementWatch: true);
+    try {
+      final QuestionService questionService = QuestionService();
+      final WatchedService watchedService = WatchedService();
+      final QuestionId? watched = await watchedService.get(
+        userData: myData,
+        question: question,
+      );
+      await watchedService.set(userData: myData, question: question);
+      if (watched != null) return;
+      await questionService.update(question, incrementWatch: true);
 
-    if (vote.value != 0 || value == 1) return;
-    if (value == 0) vote.value = 2;
-    if (value == 2) vote.value = 1;
-    final Vote? voted = await firestoreService.getVoted(myData, question);
-    if (voted != null) return;
-    await _addVote(vote.value);
-    await _voteQuestion(vote.value);
+      if (vote.value != 0 || value == 1) return;
+      if (value == 0) vote.value = 2;
+      if (value == 2) vote.value = 1;
+      final VotedService votedService = VotedService();
+      final Vote? voted = await votedService.get(
+        userData: myData,
+        question: question,
+      );
+      if (voted != null) return;
+      await _addVote(vote.value);
+      await _voteQuestion(vote.value);
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
+    }
   }
 
   Stream<Question> _getQuestionStream() async* {
-    final FirestoreService firestoreService = FirestoreService();
-    final Stream<Question?> stream =
-        firestoreService.getQuestionStream(question);
-    await for (final Question? snapshot in stream) {
-      if (snapshot != null) {
-        yield snapshot;
-      } else {
-        yield question;
+    try {
+      final QuestionService questionService = QuestionService();
+      final Stream<Question?> stream = questionService.getStream(question);
+      await for (final Question? snapshot in stream) {
+        if (snapshot != null) {
+          yield snapshot;
+        } else {
+          yield question;
+        }
       }
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
     }
   }
 
   Future<UserData?> _getUser() async {
-    final FirestoreService firestoreService = FirestoreService();
-    return await firestoreService.getUser(question.authId);
+    try {
+      final UserService userService = UserService();
+      return await userService.get(question.authId);
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
+      return null;
+    }
   }
 
   Future<void> _saveQuestion(bool asyncSaved) async {
-    final FirestoreService firestoreService = FirestoreService();
-    if (myData.anonymousFlg) {
-      asyncMsg.value = 'ログインが必要です。';
-      return;
-    } else if (asyncSaved) {
-      await firestoreService.deleteSaved(myData, question).catchError(
-        (_) {
-          asyncMsg.value = '保存解除に失敗しました。';
-        },
-      );
-    } else {
-      await firestoreService.setSaved(myData, question).catchError(
-        (_) {
-          asyncMsg.value = '保存に失敗しました。';
-        },
-      );
+    try {
+      final SavedService savedService = SavedService();
+      if (myData.anonymousFlg) {
+        asyncMsg.value = 'ログインが必要です。';
+        return;
+      } else if (asyncSaved) {
+        await savedService.delete(userData: myData, question: question);
+      } else {
+        await savedService.set(userData: myData, question: question);
+      }
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
     }
   }
 
   Stream<bool> _getSavedStream() async* {
-    final FirestoreService firestoreService = FirestoreService();
-    final Stream<QuestionId?> stream =
-        firestoreService.getSavedStream(myData, question);
-    await for (final QuestionId? snapshot in stream) {
-      yield snapshot != null;
+    try {
+      final SavedService savedService = SavedService();
+      final Stream<QuestionId?> stream =
+          savedService.getStream(userData: myData, question: question);
+      await for (final QuestionId? snapshot in stream) {
+        yield snapshot != null;
+      }
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
     }
   }
 
   Future<void> _voteQuestion(int vote) async {
-    final FirestoreService firestoreService = FirestoreService();
+    final QuestionService questionService = QuestionService();
     if (vote == 1) {
-      await firestoreService.updateQuestion(question, incrementAnswer1: true);
+      await questionService.update(question, incrementAnswer1: true);
     } else if (vote == 2) {
-      await firestoreService.updateQuestion(question, incrementAnswer2: true);
+      await questionService.update(question, incrementAnswer2: true);
     }
   }
 
   Future<void> _addVote(int vote) async {
-    final FirestoreService firestoreService = FirestoreService();
-    await firestoreService.setVoted(myData, question, vote).catchError(
-      (_) {
-        asyncMsg.value = '回答に失敗しました。';
-      },
-    );
+    final VotedService votedService = VotedService();
+    await votedService.set(userData: myData, question: question, vote: vote);
   }
 
   Stream<bool> _getVotedStream() async* {
-    final FirestoreService firestoreService = FirestoreService();
-    final Stream<Vote?> stream =
-        firestoreService.getVotedStream(myData, question);
-    await for (final Vote? snapshot in stream) {
-      yield snapshot != null;
+    try {
+      final VotedService votedService = VotedService();
+      final Stream<Vote?> stream = votedService.getStream(
+        userData: myData,
+        question: question,
+      );
+      await for (final Vote? snapshot in stream) {
+        yield snapshot != null;
+      }
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
     }
   }
 

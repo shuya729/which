@@ -7,22 +7,18 @@ class QuestionId {
     required this.questionId,
     required this.authId,
     required this.creAt,
-    required this.updAt,
   });
 
   final String questionId;
   final String authId;
   final DateTime creAt;
-  final DateTime updAt;
 
-  // init
-  factory QuestionId.init(String questionId, String authId) {
-    return QuestionId(
-      questionId: questionId,
-      authId: authId,
-      creAt: DateTime.now(),
-      updAt: DateTime.now(),
-    );
+  static Map<String, dynamic> forSet(String authId, String questionId) {
+    return <String, dynamic>{
+      'questionId': questionId,
+      'authId': authId,
+      'creAt': FieldValue.serverTimestamp(),
+    };
   }
 
   // fromQuestion
@@ -34,7 +30,6 @@ class QuestionId {
       questionId: questionId,
       authId: authId,
       creAt: DateTime.now(),
-      updAt: DateTime.now(),
     );
   }
 
@@ -44,24 +39,12 @@ class QuestionId {
       questionId: data['questionId'] as String? ?? '',
       authId: data['authId'] as String? ?? '',
       creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updAt: (data['updAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
-  }
-
-  // toFirestore
-  Map<String, dynamic> toFirestore() {
-    return <String, dynamic>{
-      'questionId': questionId,
-      'authId': authId,
-      'creAt': creAt,
-      'updAt': updAt,
-    };
   }
 
   // hashCode
   @override
-  int get hashCode =>
-      questionId.hashCode ^ authId.hashCode ^ creAt.hashCode ^ updAt.hashCode;
+  int get hashCode => questionId.hashCode ^ authId.hashCode ^ creAt.hashCode;
 
   // operator ==
   @override
@@ -71,7 +54,6 @@ class QuestionId {
     final QuestionId otherQuestionId = other as QuestionId;
     return questionId == otherQuestionId.questionId &&
         authId == otherQuestionId.authId &&
-        creAt == otherQuestionId.creAt &&
-        updAt == otherQuestionId.updAt;
+        creAt == otherQuestionId.creAt;
   }
 }
