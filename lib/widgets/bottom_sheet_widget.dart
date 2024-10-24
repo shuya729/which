@@ -39,12 +39,12 @@ class BottomSheetWidget extends HookConsumerWidget {
     }
   }
 
-  // Future<void> _test(BuildContext context) async {
-  //   Navigator.of(context).pop();
-  //   try {} catch (e) {
-  //     print(e);
-  //   }
-  // }
+  Future<void> _test(BuildContext context) async {
+    Navigator.of(context).pop();
+    try {} catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

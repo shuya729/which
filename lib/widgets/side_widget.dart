@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/color_set.dart';
+import 'package:which/models/counter.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
 
@@ -10,6 +11,7 @@ class SideWidget extends HookConsumerWidget {
     super.key,
     required this.myData,
     required this.question,
+    required this.counter,
     required this.isLeft,
     required this.colorSet,
     required this.pageController,
@@ -17,20 +19,25 @@ class SideWidget extends HookConsumerWidget {
   });
   final UserData myData;
   final Question question;
+  final Counter? counter;
   final bool isLeft;
   final ColorSet colorSet;
   final PageController pageController;
   final bool voted;
 
-  String _rateStr(Question question) {
-    final int count = isLeft ? question.answer2Count : question.answer1Count;
-    final int total = question.answer1Count + question.answer2Count;
+  String _rateStr(Question question, Counter? counter) {
+    final int answer1 = counter?.answer1 ?? 0;
+    final int answer2 = counter?.answer2 ?? 0;
+    final int count = isLeft ? answer2 : answer1;
+    final int total = answer1 + answer2;
     if (count == total) return '100';
     return (count / total * 100).toStringAsFixed(1);
   }
 
-  String _countStr(Question question) {
-    final int count = isLeft ? question.answer2Count : question.answer1Count;
+  String _countStr(Question question, Counter? counter) {
+    final int answer1 = counter?.answer1 ?? 0;
+    final int answer2 = counter?.answer2 ?? 0;
+    final int count = isLeft ? answer2 : answer1;
     return '$count p';
   }
 
@@ -102,7 +109,7 @@ class SideWidget extends HookConsumerWidget {
                   height: constraints.maxHeight * 0.22,
                   alignment: Alignment.topCenter,
                   child: AnimatedOpacity(
-                    opacity: voted ? 1 : 0,
+                    opacity: (voted && counter != null) ? 1 : 0,
                     duration: const Duration(milliseconds: 600),
                     child: Column(
                       children: [
@@ -125,7 +132,7 @@ class SideWidget extends HookConsumerWidget {
                                 maxHeight: constraints.maxHeight * 0.15,
                               ),
                               child: AutoSizeText(
-                                _rateStr(question),
+                                _rateStr(question, counter),
                                 minFontSize: 30,
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
@@ -168,7 +175,7 @@ class SideWidget extends HookConsumerWidget {
                           ),
                           alignment: Alignment.topCenter,
                           child: AutoSizeText(
-                            _countStr(question),
+                            _countStr(question, counter),
                             minFontSize: 10,
                             textAlign: TextAlign.center,
                             maxLines: 1,

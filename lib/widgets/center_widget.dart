@@ -72,22 +72,15 @@ class CenterWidget extends HookConsumerWidget {
                       width: constraints.maxWidth * 0.7,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.all(10),
-                      child: InkWell(
-                        mouseCursor: SystemMouseCursors.click,
-                        onTap: () => pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          constraints: const BoxConstraints(maxWidth: 600),
-                          child: AutoSizeText(
-                            question.answer1,
-                            minFontSize: 10,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 26,
-                            ),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        constraints: const BoxConstraints(maxWidth: 600),
+                        child: AutoSizeText(
+                          question.answer1,
+                          minFontSize: 10,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 26,
                           ),
                         ),
                       ),
@@ -135,22 +128,15 @@ class CenterWidget extends HookConsumerWidget {
                       width: constraints.maxWidth * 0.7,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.all(10),
-                      child: InkWell(
-                        mouseCursor: SystemMouseCursors.click,
-                        onTap: () => pageController.previousPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          constraints: const BoxConstraints(maxWidth: 600),
-                          child: AutoSizeText(
-                            question.answer2,
-                            minFontSize: 10,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 26,
-                            ),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        constraints: const BoxConstraints(maxWidth: 600),
+                        child: AutoSizeText(
+                          question.answer2,
+                          minFontSize: 10,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 26,
                           ),
                         ),
                       ),

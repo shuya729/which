@@ -5,6 +5,8 @@ import { createEmbedding } from "../utils/create_embedding";
 import { Question } from "../models/question";
 import { Embedding } from "../models/embedding";
 import { sortQuestions } from "../utils/sort_questions";
+import { getCounters } from "../utils/get_counters";
+import { Counter } from "../models/counter";
 
 export const searchQuestions = onCall(
   {
@@ -64,9 +66,12 @@ export const searchQuestions = onCall(
       }
     }
 
+    const counters: Counter[] = await getCounters(db, questions);
+
     const sortedQuestions: Question[] = sortQuestions(
       embedding,
       embeddings,
+      counters,
       questions,
       embeddingRate,
       latestRate,

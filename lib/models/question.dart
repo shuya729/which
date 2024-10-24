@@ -9,10 +9,6 @@ class Question {
     required this.quest,
     required this.answer1,
     required this.answer2,
-    required this.readCount,
-    required this.watchCount,
-    required this.answer1Count,
-    required this.answer2Count,
     required this.editedFlg,
     required this.hiddenFlg,
     required this.deletedFlg,
@@ -26,10 +22,6 @@ class Question {
   final String quest;
   final String answer1;
   final String answer2;
-  final int readCount;
-  final int watchCount;
-  final int answer1Count;
-  final int answer2Count;
   final bool editedFlg;
   final bool hiddenFlg;
   final bool deletedFlg;
@@ -50,10 +42,6 @@ class Question {
       'quest': quest,
       'answer1': answer1,
       'answer2': answer2,
-      'readCount': 0,
-      'watchCount': 0,
-      'answer1Count': 0,
-      'answer2Count': 0,
       'editedFlg': false,
       'hiddenFlg': false,
       'deletedFlg': false,
@@ -61,20 +49,6 @@ class Question {
       'creAt': FieldValue.serverTimestamp(),
       'updAt': FieldValue.serverTimestamp(),
     };
-  }
-
-  Map<String, dynamic> forUpdate({
-    bool incrementRead = false,
-    bool incrementWatch = false,
-    bool incrementAnswer1 = false,
-    bool incrementAnswer2 = false,
-  }) {
-    final Map<String, dynamic> data = {'updAt': FieldValue.serverTimestamp()};
-    if (incrementRead) data['readCount'] = FieldValue.increment(1);
-    if (incrementWatch) data['watchCount'] = FieldValue.increment(1);
-    if (incrementAnswer1) data['answer1Count'] = FieldValue.increment(1);
-    if (incrementAnswer2) data['answer2Count'] = FieldValue.increment(1);
-    return data;
   }
 
   // fromMap(fromJson)
@@ -85,10 +59,6 @@ class Question {
       quest: data['quest'] as String? ?? '',
       answer1: data['answer1'] as String? ?? '',
       answer2: data['answer2'] as String? ?? '',
-      readCount: data['readCount'] as int? ?? 0,
-      watchCount: data['watchCount'] as int? ?? 0,
-      answer1Count: data['answer1Count'] as int? ?? 0,
-      answer2Count: data['answer2Count'] as int? ?? 0,
       editedFlg: data['editedFlg'] as bool? ?? false,
       hiddenFlg: data['hiddenFlg'] as bool? ?? false,
       deletedFlg: data['deletedFlg'] as bool? ?? false,
@@ -110,10 +80,6 @@ class Question {
       quest: data['quest'] as String? ?? '',
       answer1: data['answer1'] as String? ?? '',
       answer2: data['answer2'] as String? ?? '',
-      readCount: data['readCount'] as int? ?? 0,
-      watchCount: data['watchCount'] as int? ?? 0,
-      answer1Count: data['answer1Count'] as int? ?? 0,
-      answer2Count: data['answer2Count'] as int? ?? 0,
       editedFlg: data['editedFlg'] as bool? ?? false,
       hiddenFlg: data['hiddenFlg'] as bool? ?? false,
       deletedFlg: data['deletedFlg'] as bool? ?? false,
@@ -130,10 +96,6 @@ class Question {
     String? quest,
     String? answer1,
     String? answer2,
-    int? readCount,
-    int? watchCount,
-    int? answer1Count,
-    int? answer2Count,
     bool? editedFlg,
     bool? hiddenFlg,
     bool? deletedFlg,
@@ -147,10 +109,6 @@ class Question {
       quest: quest ?? this.quest,
       answer1: answer1 ?? this.answer1,
       answer2: answer2 ?? this.answer2,
-      readCount: readCount ?? this.readCount,
-      watchCount: watchCount ?? this.watchCount,
-      answer1Count: answer1Count ?? this.answer1Count,
-      answer2Count: answer2Count ?? this.answer2Count,
       editedFlg: editedFlg ?? this.editedFlg,
       hiddenFlg: hiddenFlg ?? this.hiddenFlg,
       deletedFlg: deletedFlg ?? this.deletedFlg,
@@ -168,10 +126,6 @@ class Question {
       quest.hashCode ^
       answer1.hashCode ^
       answer2.hashCode ^
-      readCount.hashCode ^
-      watchCount.hashCode ^
-      answer1Count.hashCode ^
-      answer2Count.hashCode ^
       editedFlg.hashCode ^
       hiddenFlg.hashCode ^
       deletedFlg.hashCode ^
@@ -190,10 +144,6 @@ class Question {
         quest == otherQuestion.quest &&
         answer1 == otherQuestion.answer1 &&
         answer2 == otherQuestion.answer2 &&
-        readCount == otherQuestion.readCount &&
-        watchCount == otherQuestion.watchCount &&
-        answer1Count == otherQuestion.answer1Count &&
-        answer2Count == otherQuestion.answer2Count &&
         editedFlg == otherQuestion.editedFlg &&
         hiddenFlg == otherQuestion.hiddenFlg &&
         deletedFlg == otherQuestion.deletedFlg &&

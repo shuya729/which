@@ -186,7 +186,7 @@ class CreatedScreen extends ScreenBase {
           );
       pageController.addListener(listener);
       return () => pageController.removeListener(listener);
-    }, [myData, pageController, questions, indexes, diff]);
+    }, [myData, pageController, questions.value, indexes.value, diff.value]);
 
     final future = useMemoized(
       () => showFutureLoading(

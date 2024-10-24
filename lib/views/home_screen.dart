@@ -215,7 +215,13 @@ class HomeScreen extends ScreenBase {
           );
       pageController.addListener(listener);
       return () => pageController.removeListener(listener);
-    }, [pageController, textController, questionsNotifier, indexes, diff]);
+    }, [
+      pageController,
+      textController,
+      questionsNotifier,
+      indexes,
+      diff.value,
+    ]);
 
     return questionsTemp(
       loading: loading.value,

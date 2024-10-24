@@ -25,38 +25,17 @@ class QuestionService {
     ));
   }
 
-  Future<void> update(
-    Question question, {
-    bool incrementRead = false,
-    bool incrementWatch = false,
-    bool incrementAnswer1 = false,
-    bool incrementAnswer2 = false,
-  }) async {
-    await doc(question.questionId).update(
-      question.forUpdate(
-        incrementRead: incrementRead,
-        incrementWatch: incrementWatch,
-        incrementAnswer1: incrementAnswer1,
-        incrementAnswer2: incrementAnswer2,
-      ),
-    );
-  }
-
   Future<void> delete(Question question) async {
     await doc(question.questionId).delete();
   }
 
-  Stream<Question?> getStream(Question question) async* {
-    final Stream<DocumentSnapshot> snapshots =
-        doc(question.questionId).snapshots();
-    await for (final DocumentSnapshot snapshot in snapshots) {
-      if (snapshot.exists && snapshot.data() is Map<String, dynamic>) {
-        final Map<String, dynamic> data =
-            snapshot.data() as Map<String, dynamic>;
-        yield Question.fromFirestore(data);
-      } else {
-        yield null;
-      }
+  Future<Question?> get(Question question) async {
+    final DocumentSnapshot snapshot = await doc(question.questionId).get();
+    if (snapshot.exists && snapshot.data() is Map<String, dynamic>) {
+      final Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      return Question.fromFirestore(data);
+    } else {
+      return null;
     }
   }
 

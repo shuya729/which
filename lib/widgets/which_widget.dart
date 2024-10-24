@@ -4,10 +4,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:which/models/color_set.dart';
+import 'package:which/models/counter.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/question_id.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/models/vote.dart';
+import 'package:which/services/counter_service.dart';
 import 'package:which/services/question_service.dart';
 import 'package:which/services/readed_service.dart';
 import 'package:which/services/saved_service.dart';
@@ -29,63 +31,47 @@ class WhichWidget extends HookConsumerWidget {
   final Question question;
   final ValueNotifier<String> asyncMsg;
 
-  Future<void> _init() async {
+  void _init() async {
     try {
-      final QuestionService questionService = QuestionService();
       final ReadedService readedService = ReadedService();
-      final QuestionId? readed = await readedService.get(
-        userData: myData,
-        question: question,
-      );
-      await readedService.set(userData: myData, question: question);
-      if (readed != null) return;
-      await questionService.update(question, incrementRead: true);
+      final CounterService counterService = CounterService();
+      readedService.set(userData: myData, question: question);
+      counterService.increment(question, incrementRead: true);
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';
     }
   }
 
-  Future<void> _onPageChanged(
-    int value,
-    ValueNotifier<int> vote,
-  ) async {
+  void _onPageChanged(final int value, final ValueNotifier<int> voted) async {
     try {
-      final QuestionService questionService = QuestionService();
+      if (voted.value != 0 || value == 1) return;
+      if (value == 0) voted.value = 2;
+      if (value == 2) voted.value = 1;
       final WatchedService watchedService = WatchedService();
-      final QuestionId? watched = await watchedService.get(
-        userData: myData,
-        question: question,
-      );
-      await watchedService.set(userData: myData, question: question);
-      if (watched != null) return;
-      await questionService.update(question, incrementWatch: true);
-
-      if (vote.value != 0 || value == 1) return;
-      if (value == 0) vote.value = 2;
-      if (value == 2) vote.value = 1;
-      final VotedService votedService = VotedService();
-      final Vote? voted = await votedService.get(
-        userData: myData,
-        question: question,
-      );
-      if (voted != null) return;
-      await _addVote(vote.value);
-      await _voteQuestion(vote.value);
+      final CounterService counterService = CounterService();
+      watchedService.set(userData: myData, question: question);
+      counterService.increment(question, incrementWatch: true);
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';
     }
   }
 
-  Stream<Question> _getQuestionStream() async* {
+  Future<Question?> _getQuestion() async {
     try {
       final QuestionService questionService = QuestionService();
-      final Stream<Question?> stream = questionService.getStream(question);
-      await for (final Question? snapshot in stream) {
-        if (snapshot != null) {
-          yield snapshot;
-        } else {
-          yield question;
-        }
+      return await questionService.get(question);
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
+      return null;
+    }
+  }
+
+  Stream<Counter?> _getCounterStream() async* {
+    try {
+      final CounterService counterService = CounterService();
+      final Stream<Counter?> stream = counterService.getStream(question);
+      await for (final Counter? snapshot in stream) {
+        yield snapshot;
       }
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';
@@ -102,16 +88,16 @@ class WhichWidget extends HookConsumerWidget {
     }
   }
 
-  Future<void> _saveQuestion(bool asyncSaved) async {
+  void _save(bool asyncSaved) async {
     try {
       final SavedService savedService = SavedService();
       if (myData.anonymousFlg) {
         asyncMsg.value = 'ログインが必要です。';
         return;
       } else if (asyncSaved) {
-        await savedService.delete(userData: myData, question: question);
+        savedService.delete(userData: myData, question: question);
       } else {
-        await savedService.set(userData: myData, question: question);
+        savedService.set(userData: myData, question: question);
       }
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';
@@ -131,18 +117,20 @@ class WhichWidget extends HookConsumerWidget {
     }
   }
 
-  Future<void> _voteQuestion(int vote) async {
-    final QuestionService questionService = QuestionService();
-    if (vote == 1) {
-      await questionService.update(question, incrementAnswer1: true);
-    } else if (vote == 2) {
-      await questionService.update(question, incrementAnswer2: true);
+  void _vote(final ValueNotifier<int> voted, final bool? asyncVoted) {
+    try {
+      if (voted.value == 0 || asyncVoted != false) return;
+      final VotedService votedService = VotedService();
+      final CounterService counterService = CounterService();
+      votedService.set(userData: myData, question: question, vote: voted.value);
+      if (voted.value == 1) {
+        counterService.increment(question, incrementAnswer1: true);
+      } else if (voted.value == 2) {
+        counterService.increment(question, incrementAnswer2: true);
+      }
+    } catch (e) {
+      asyncMsg.value = 'エラーが発生しました。';
     }
-  }
-
-  Future<void> _addVote(int vote) async {
-    final VotedService votedService = VotedService();
-    await votedService.set(userData: myData, question: question, vote: vote);
   }
 
   Stream<bool> _getVotedStream() async* {
@@ -186,23 +174,30 @@ class WhichWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorSet colorSet = useState(ColorSet.set()).value;
     final PageController pageController = usePageController(initialPage: 1);
-    final Stream<Question> streamQuestion =
-        useMemoized(() => _getQuestionStream(), [question]);
-    final Question asyncQuestion = useStream(streamQuestion).data ?? question;
+    final Future<Question?> futureQuestion =
+        useMemoized(() => _getQuestion(), [question]);
+    final Question asyncQuestion = useFuture(futureQuestion).data ?? question;
+    final Stream<Counter?> streamCounter =
+        useMemoized(() => _getCounterStream(), [question]);
+    final Counter? asyncCounter = useStream(streamCounter).data;
     final Future<UserData?> futureUser =
         useMemoized(() => _getUser(), [question]);
     final UserData? asyncUser = useFuture(futureUser).data;
     final Stream<bool> streamSaved =
         useMemoized(() => _getSavedStream(), [myData, question]);
     final bool asyncSaved = useStream(streamSaved).data ?? false;
-    final ValueNotifier<int> vote = useState(0);
     final Stream<bool> streamVoted =
         useMemoized(() => _getVotedStream(), [myData, question]);
-    final bool asyncVoted = useStream(streamVoted).data ?? false;
+    final bool? asyncVoted = useStream(streamVoted).data;
+    final ValueNotifier<int> voted = useState(0);
     useEffect(() {
       _init();
       return null;
     }, []);
+    useEffect(() {
+      _vote(voted, asyncVoted);
+      return null;
+    }, [voted.value, asyncVoted]);
 
     return Stack(
       fit: StackFit.expand,
@@ -210,15 +205,16 @@ class WhichWidget extends HookConsumerWidget {
         PageView(
           scrollDirection: Axis.horizontal,
           controller: pageController,
-          onPageChanged: (value) => _onPageChanged(value, vote),
+          onPageChanged: (value) => _onPageChanged(value, voted),
           children: [
             SideWidget(
               myData: myData,
               question: asyncQuestion,
+              counter: asyncCounter,
               isLeft: true,
               colorSet: colorSet,
               pageController: pageController,
-              voted: asyncVoted,
+              voted: asyncVoted ?? false,
             ),
             CenterWidget(
               myData: myData,
@@ -229,10 +225,11 @@ class WhichWidget extends HookConsumerWidget {
             SideWidget(
               myData: myData,
               question: asyncQuestion,
+              counter: asyncCounter,
               isLeft: false,
               colorSet: colorSet,
               pageController: pageController,
-              voted: asyncVoted,
+              voted: asyncVoted ?? false,
             ),
           ],
         ),
@@ -354,7 +351,7 @@ class WhichWidget extends HookConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              !asyncVoted
+                              (asyncVoted != true)
                                   ? const SizedBox(height: 25)
                                   : Container(
                                       height: 25,
@@ -378,7 +375,7 @@ class WhichWidget extends HookConsumerWidget {
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed: () => _saveQuestion(asyncSaved),
+                                    onPressed: () => _save(asyncSaved),
                                     icon: Icon(
                                       asyncSaved
                                           ? Icons.bookmark

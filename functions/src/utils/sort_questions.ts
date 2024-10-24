@@ -1,3 +1,4 @@
+import { Counter } from "../models/counter";
 import { Embedding } from "../models/embedding";
 import { Question } from "../models/question";
 import { Score } from "../models/score";
@@ -6,6 +7,7 @@ import { calcScore } from "./calc_score";
 export const sortQuestions = (
   embedding: number[],
   embeddings: Embedding[],
+  counters: Counter[],
   questions: Question[],
   embeddingRate: number,
   latestRate: number,
@@ -55,7 +57,19 @@ export const sortQuestions = (
 
   // questionsのpopularRateが高い順にソート
   const popularOrderIds: string[] = [];
-  questions.sort((a, b) => b.getPopularRate - a.getPopularRate);
+  questions.sort((a, b) => {
+    const indexA = counters.findIndex(
+      (counter) => counter.questionId === a.questionId
+    );
+    const indexB = counters.findIndex(
+      (counter) => counter.questionId === b.questionId
+    );
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    const popularA = counters[indexA].getPopular();
+    const popularB = counters[indexB].getPopular();
+    return popularB - popularA;
+  });
   questions.forEach((question) => popularOrderIds.push(question.questionId));
 
   // スコアリング

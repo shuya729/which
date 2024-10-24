@@ -21,18 +21,4 @@ class ReadedService {
       SetOptions(merge: true),
     );
   }
-
-  Future<QuestionId?> get({
-    required UserData userData,
-    required Question question,
-  }) async {
-    final DocumentSnapshot snapshot =
-        await doc(userData.authId, question.questionId).get();
-    if (snapshot.exists && snapshot.data() is Map<String, dynamic>) {
-      final Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-      return QuestionId.fromFirestore(data);
-    } else {
-      return null;
-    }
-  }
 }
