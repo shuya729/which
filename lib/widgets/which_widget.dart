@@ -31,26 +31,29 @@ class WhichWidget extends HookConsumerWidget {
   final Question question;
   final ValueNotifier<String> asyncMsg;
 
-  void _init() async {
+  Future<void> _init() async {
     try {
       final ReadedService readedService = ReadedService();
       final CounterService counterService = CounterService();
-      readedService.set(userData: myData, question: question);
-      counterService.increment(question, incrementRead: true);
+      await readedService.set(userData: myData, question: question);
+      await counterService.increment(question, incrementRead: true);
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';
     }
   }
 
-  void _onPageChanged(final int value, final ValueNotifier<int> voted) async {
+  Future<void> _onPageChanged(
+    final int value,
+    final ValueNotifier<int> voted,
+  ) async {
     try {
       if (voted.value != 0 || value == 1) return;
       if (value == 0) voted.value = 2;
       if (value == 2) voted.value = 1;
       final WatchedService watchedService = WatchedService();
       final CounterService counterService = CounterService();
-      watchedService.set(userData: myData, question: question);
-      counterService.increment(question, incrementWatch: true);
+      await watchedService.set(userData: myData, question: question);
+      await counterService.increment(question, incrementWatch: true);
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';
     }
@@ -88,16 +91,16 @@ class WhichWidget extends HookConsumerWidget {
     }
   }
 
-  void _save(bool asyncSaved) async {
+  Future<void> _save(bool asyncSaved) async {
     try {
       final SavedService savedService = SavedService();
       if (myData.anonymousFlg) {
         asyncMsg.value = 'ログインが必要です。';
         return;
       } else if (asyncSaved) {
-        savedService.delete(userData: myData, question: question);
+        await savedService.delete(userData: myData, question: question);
       } else {
-        savedService.set(userData: myData, question: question);
+        await savedService.set(userData: myData, question: question);
       }
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';
@@ -117,16 +120,20 @@ class WhichWidget extends HookConsumerWidget {
     }
   }
 
-  void _vote(final ValueNotifier<int> voted, final bool? asyncVoted) {
+  Future<void> _vote(
+    final ValueNotifier<int> voted,
+    final bool? asyncVoted,
+  ) async {
     try {
       if (voted.value == 0 || asyncVoted != false) return;
       final VotedService votedService = VotedService();
       final CounterService counterService = CounterService();
-      votedService.set(userData: myData, question: question, vote: voted.value);
+      await votedService.set(
+          userData: myData, question: question, vote: voted.value);
       if (voted.value == 1) {
-        counterService.increment(question, incrementAnswer1: true);
+        await counterService.increment(question, incrementAnswer1: true);
       } else if (voted.value == 2) {
-        counterService.increment(question, incrementAnswer2: true);
+        await counterService.increment(question, incrementAnswer2: true);
       }
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';

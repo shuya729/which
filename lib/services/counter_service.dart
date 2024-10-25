@@ -24,6 +24,7 @@ class CounterService {
     await doc.set(
       Counter.forIncrement(
         question,
+        doc.id,
         incrementRead: incrementRead,
         incrementWatch: incrementWatch,
         incrementAnswer1: incrementAnswer1,

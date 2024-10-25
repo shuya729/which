@@ -1,0 +1,186 @@
+rules_version = '2';
+
+service cloud.firestore {
+
+  // isAuthed
+  function isAuthed() {
+    return request.auth != null;
+  }
+
+  // isCollectionOwner
+  function isCollectionOwner(authId) {
+    return isAuthed() && authId == request.auth.uid;
+  }
+
+  // isResounrceOwner
+  function isResounrceOwner() {
+    return isAuthed() && resource.data.authId == request.auth.uid;
+  }
+
+  // validUsers
+  function validUsers() {
+    let allFields = ['authId', 'userId', 'name', 'image', 'anonymousFlg', 'deletedFlg', 'rejectedFlg', 'creAt', 'updAt'];
+    let required = ['authId'];
+    let data = request.resource.data;
+    return data.keys().hasAll(required)
+      && data.keys().hasOnly(allFields)
+      && data.authId is string
+      && data.authId == request.auth.uid
+      && (!data.keys().hasAny(['userId']) || data.userId is string)
+      && (!data.keys().hasAny(['name']) || data.name is string)
+      && (!data.keys().hasAny(['image']) || data.image is string)
+      && (!data.keys().hasAny(['anonymousFlg']) || data.anonymousFlg is bool)
+      && (!data.keys().hasAny(['deletedFlg']) || data.deletedFlg is bool)
+      && (!data.keys().hasAny(['rejectedFlg']) || data.rejectedFlg is bool)
+      && (!data.keys().hasAny(['creAt']) || data.creAt is timestamp)
+      && (!data.keys().hasAny(['updAt']) || data.updAt is timestamp);
+  }
+
+  // validVoted
+  function validVoted(questionId) {
+    let allFields = ['questionId', 'authId', 'vote', 'creAt'];
+    let required = ['questionId', 'authId'];
+    let data = request.resource.data;
+    return data.keys().hasAll(required)
+      && data.keys().hasOnly(allFields)
+      && data.questionId is string
+      && data.questionId == questionId
+      && data.authId is string
+      && data.authId == request.auth.uid
+      && (!data.keys().hasAny(['vote']) || data.vote is int)
+      && (!data.keys().hasAny(['creAt']) || data.creAt is timestamp);
+  }
+
+  // validQuestionId
+  function validQuestionId(questionId) {
+    let allFields = ['questionId', 'authId', 'creAt'];
+    let required = ['questionId', 'authId'];
+    let data = request.resource.data;
+    return data.keys().hasAll(required)
+      && data.keys().hasOnly(allFields)
+      && data.questionId is string
+      && data.questionId == questionId
+      && data.authId is string
+      && data.authId == request.auth.uid
+      && (!data.keys().hasAny(['creAt']) || data.creAt is timestamp);
+  }
+
+  // validShards
+  function validShards(questionId, shardId) {
+    let allFields = ['questionId', 'shardId', 'readed', 'watched', 'answer1', 'answer2'];
+    let required = ['questionId', 'shardId'];
+    let data = request.resource.data;
+    return data.keys().hasAll(required)
+      && data.keys().hasOnly(allFields)
+      && data.questionId is string
+      && data.questionId == questionId
+      && data.shardId is string
+      && data.shardId == shardId
+      && (!data.keys().hasAny(['readed']) || data.readed is int)
+      && (!data.keys().hasAny(['watched']) || data.watched is int)
+      && (!data.keys().hasAny(['answer1']) || data.answer1 is int)
+      && (!data.keys().hasAny(['answer2']) || data.answer2 is int);
+  }
+
+  // validQuestion
+  function validQuestion(questionId) {
+    let allFields = ['questionId', 'authId', 'quest', 'answer1', 'answer2', 'editedFlg', 'hiddenFlg', 'deletedFlg', 'rejectedFlg', 'creAt', 'updAt'];
+    let required = ['questionId', 'authId'];
+    let data = request.resource.data;
+    return data.keys().hasAll(required)
+      && data.keys().hasOnly(allFields)
+      && data.questionId is string
+      && data.questionId == questionId
+      && data.authId is string
+      && data.authId == request.auth.uid
+      && (!data.keys().hasAny(['quest']) || data.quest is string)
+      && (!data.keys().hasAny(['answer1']) || data.answer1 is string)
+      && (!data.keys().hasAny(['answer2']) || data.answer2 is string)
+      && (!data.keys().hasAny(['editedFlg']) || data.editedFlg is bool)
+      && (!data.keys().hasAny(['hiddenFlg']) || data.hiddenFlg is bool)
+      && (!data.keys().hasAny(['deletedFlg']) || data.deletedFlg is bool)
+      && (!data.keys().hasAny(['rejectedFlg']) || data.rejectedFlg is bool)
+      && (!data.keys().hasAny(['creAt']) || data.creAt is timestamp)
+      && (!data.keys().hasAny(['updAt']) || data.updAt is timestamp);
+  }
+
+  // validContacts
+  function validContacts(contactId) {
+    let allFields = ['contactId', 'authId', 'name', 'email', 'subject', 'content', 'creAt'];
+    let required = ['contactId', 'authId'];
+    let data = request.resource.data;
+    return data.keys().hasAll(required)
+      && data.keys().hasOnly(allFields)
+      && data.contactId is string
+      && data.contactId == contactId
+      && data.authId is string
+      && data.authId == request.auth.uid
+      && (!data.keys().hasAny(['name']) || data.name is string)
+      && (!data.keys().hasAny(['email']) || data.email is string)
+      && (!data.keys().hasAny(['subject']) || data.subject is int)
+      && (!data.keys().hasAny(['content']) || data.content is string)
+      && (!data.keys().hasAny(['creAt']) || data.creAt is timestamp);
+  }
+
+  match /databases/{database}/documents {
+    // Users
+    match /users/{authId} {
+      allow read: if isAuthed();
+      allow create, update: if isCollectionOwner(authId) && validUsers();
+      allow delete: if isCollectionOwner(authId);
+
+      // voted
+      match /voted/{questionId} {
+        allow read: if isCollectionOwner(authId);
+        allow create, update: if isCollectionOwner(authId) && validVoted(questionId);
+        allow delete: if isCollectionOwner(authId);
+      }
+
+      // readed
+      match /readed/{questionId} {
+        allow read: if isCollectionOwner(authId);
+        allow create, update: if isCollectionOwner(authId) && validQuestionId(questionId);
+        allow delete: if isCollectionOwner(authId);
+      }
+
+      // watched
+      match /watched/{questionId} {
+        allow read: if readOwner(authId);
+        allow create, update: if isCollectionOwner(authId) && validQuestionId(questionId);
+        allow delete: if isCollectionOwner(authId);
+      }
+
+      // saved
+      match /saved/{questionId} {
+        allow read: if isCollectionOwner(authId);
+        allow create, update: if isCollectionOwner(authId) && validQuestionId(questionId);
+        allow delete: if isCollectionOwner(authId);
+      } 
+    }
+
+    // Questions
+    match /questions/{questionId} {
+      allow read: if isAuthed();
+      allow create: if isAuthed() && validQuestion(questionId);
+      allow update: if isResounrceOwner() && validQuestion(questionId);
+      allow delete: if isResounrceOwner();
+
+      // shards
+      match /shards/{shardId} {
+        allow read: if isAuthed();
+        allow create, update: if isAuthed() && validShards(questionId, shardId);
+      }
+
+      // reports
+      match /reports/{authId} {
+        allow create, update: if isCollectionOwner(authId) && validQuestionId(questionId);
+      }
+    }
+
+    // Contacts
+    match /contacts/{contactId} {
+      allow create: if isAuthed() && validContacts(contactId);
+    }
+
+  }
+}

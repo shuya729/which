@@ -6,6 +6,7 @@ import 'package:which/models/question.dart';
 class Counter {
   static const int shardsNum = 10;
   final String questionId;
+  final String shardId;
   final int readed;
   final int watched;
   final int answer1;
@@ -13,6 +14,7 @@ class Counter {
 
   const Counter({
     required this.questionId,
+    required this.shardId,
     required this.readed,
     required this.watched,
     required this.answer1,
@@ -20,13 +22,17 @@ class Counter {
   });
 
   static Map<String, dynamic> forIncrement(
-    Question question, {
+    Question question,
+    String shardId, {
     bool incrementRead = false,
     bool incrementWatch = false,
     bool incrementAnswer1 = false,
     bool incrementAnswer2 = false,
   }) {
-    final Map<String, dynamic> data = {'questionId': question.questionId};
+    final Map<String, dynamic> data = {
+      'questionId': question.questionId,
+      'shardId': shardId,
+    };
     if (incrementRead) data['readed'] = FieldValue.increment(1);
     if (incrementWatch) data['watched'] = FieldValue.increment(1);
     if (incrementAnswer1) data['answer1'] = FieldValue.increment(1);
@@ -36,6 +42,7 @@ class Counter {
 
   factory Counter.fromDocs(List<DocumentSnapshot> docs) {
     String questionId = '';
+    String shardId = '';
     int readed = 0;
     int watched = 0;
     int answer1 = 0;
@@ -43,6 +50,7 @@ class Counter {
     for (final DocumentSnapshot doc in docs) {
       final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
       questionId = data['questionId'] as String? ?? '';
+      shardId = data['shardId'] as String? ?? '';
       readed += data['readed'] as int? ?? 0;
       watched += data['watched'] as int? ?? 0;
       answer1 += data['answer1'] as int? ?? 0;
@@ -50,6 +58,7 @@ class Counter {
     }
     return Counter(
       questionId: questionId,
+      shardId: shardId,
       readed: readed,
       watched: watched,
       answer1: answer1,
@@ -67,6 +76,7 @@ class Counter {
   }) {
     return Counter(
       questionId: questionId ?? this.questionId,
+      shardId: shardId,
       readed: readed ?? this.readed,
       watched: watched ?? this.watched,
       answer1: answer1 ?? this.answer1,
@@ -78,6 +88,7 @@ class Counter {
   @override
   int get hashCode =>
       questionId.hashCode ^
+      shardId.hashCode ^
       readed.hashCode ^
       watched.hashCode ^
       answer1.hashCode ^
@@ -90,6 +101,7 @@ class Counter {
       other is Counter &&
           runtimeType == other.runtimeType &&
           questionId == other.questionId &&
+          shardId == other.shardId &&
           readed == other.readed &&
           watched == other.watched &&
           answer1 == other.answer1 &&
