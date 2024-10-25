@@ -18,7 +18,7 @@ class QuestionService {
     final DocumentReference doc = collection.doc();
     await doc.set(Question.forSet(
       doc.id,
-      userData.authId,
+      userData.anonymousFlg ? '' : userData.authId,
       quest,
       answer1,
       answer2,

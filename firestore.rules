@@ -92,7 +92,7 @@ service cloud.firestore {
       && data.questionId is string
       && data.questionId == questionId
       && data.authId is string
-      && data.authId == request.auth.uid
+      && (data.authId == request.auth.uid || data.authId == '')
       && (!data.keys().hasAny(['quest']) || data.quest is string)
       && (!data.keys().hasAny(['answer1']) || data.answer1 is string)
       && (!data.keys().hasAny(['answer2']) || data.answer2 is string)
