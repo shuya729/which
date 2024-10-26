@@ -104,6 +104,20 @@ service cloud.firestore {
       && (!data.keys().hasAny(['updAt']) || data.updAt is timestamp);
   }
 
+  // validUserInfo
+  function validUserInfo() {
+    let allFields = ['authId', 'userId', 'lastAt', 'anonymousFlg'];
+    let required = ['authId', 'userId'];
+    let data = request.resource.data;
+    return data.keys().hasAll(required)
+      && data.keys().hasOnly(allFields)
+      && data.authId is string
+      && data.authId == request.auth.uid
+      && data.userId is string
+      && (!data.keys().hasAny(['lastAt']) || data.lastAt is timestamp)
+      && (!data.keys().hasAny(['anonymousFlg']) || data.anonymousFlg is bool);
+  }
+
   // validContacts
   function validContacts(contactId) {
     let allFields = ['contactId', 'authId', 'name', 'email', 'subject', 'content', 'creAt'];
@@ -145,7 +159,7 @@ service cloud.firestore {
 
       // watched
       match /watched/{questionId} {
-        allow read: if readOwner(authId);
+        allow read: if isCollectionOwner(authId);
         allow create, update: if isCollectionOwner(authId) && validQuestionId(questionId);
         allow delete: if isCollectionOwner(authId);
       }
@@ -175,6 +189,11 @@ service cloud.firestore {
       match /reports/{authId} {
         allow create, update: if isCollectionOwner(authId) && validQuestionId(questionId);
       }
+    }
+
+    // Infos
+    match /infos/{authId} {
+      allow create, update: if isCollectionOwner(authId) && validUserInfo();
     }
 
     // Contacts

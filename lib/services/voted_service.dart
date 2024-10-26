@@ -19,7 +19,7 @@ class VotedService {
     final DocumentReference doc =
         collection(userData.authId).doc(question.questionId);
     await doc.set(
-      Vote.forSet(userData.authId, question.questionId, vote),
+      Vote.forSet(question.questionId, userData.authId, vote),
       SetOptions(merge: true),
     );
   }

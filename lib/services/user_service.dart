@@ -4,7 +4,7 @@ import 'package:which/models/user_data.dart';
 class UserService {
   static CollectionReference get collection =>
       FirebaseFirestore.instance.collection('users');
-  static DocumentReference doc([String? authId]) => collection.doc(authId);
+  static DocumentReference doc(String authId) => collection.doc(authId);
 
   Future<void> set({
     required String authId,

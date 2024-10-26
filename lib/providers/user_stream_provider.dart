@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/user_data.dart';
+import 'package:which/services/user_info_service.dart';
 import 'package:which/services/user_service.dart';
 
 final StreamProvider<User?> _asyncUserProvider = StreamProvider<User?>(
-  (_) => FirebaseAuth.instance.userChanges().handleError((e) => throw e),
+  (_) => FirebaseAuth.instance.userChanges(),
 );
 
 final StreamProvider<UserData> userStreamProvider = StreamProvider<UserData>(
@@ -21,6 +22,7 @@ final StreamProvider<UserData> userStreamProvider = StreamProvider<UserData>(
       } else {
         final DocumentReference userRef = UserService.doc(user.uid);
         final UserService userService = UserService();
+        final UserInfoService userInfoService = UserInfoService();
         final Stream<DocumentSnapshot> stream = userRef.snapshots();
         await for (final DocumentSnapshot snapshot in stream) {
           if (!snapshot.exists || snapshot.data() is! Map<String, dynamic>) {
@@ -38,6 +40,7 @@ final StreamProvider<UserData> userStreamProvider = StreamProvider<UserData>(
                 anonymousFlg: user.isAnonymous,
               );
             } else {
+              await userInfoService.login(userData: myData);
               yield myData;
             }
           }
