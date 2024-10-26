@@ -31,7 +31,16 @@ class WhichWidget extends HookConsumerWidget {
   final Question question;
   final ValueNotifier<String> asyncMsg;
 
-  Future<void> _init() async {
+  Future<void> _init(
+    final ValueNotifier<ColorSet> colorSet,
+    final PageController pageController,
+    final ValueNotifier<int> voted,
+  ) async {
+    if (pageController.hasClients) {
+      colorSet.value = ColorSet.set();
+      pageController.jumpToPage(1);
+      voted.value = 0;
+    }
     try {
       final ReadedService readedService = ReadedService();
       final CounterService counterService = CounterService();
@@ -179,7 +188,7 @@ class WhichWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ColorSet colorSet = useState(ColorSet.set()).value;
+    final ValueNotifier<ColorSet> colorSet = useState(ColorSet.set());
     final PageController pageController = usePageController(initialPage: 1);
     final Future<Question?> futureQuestion =
         useMemoized(() => _getQuestion(), [question]);
@@ -198,9 +207,9 @@ class WhichWidget extends HookConsumerWidget {
     final bool? asyncVoted = useStream(streamVoted).data;
     final ValueNotifier<int> voted = useState(0);
     useEffect(() {
-      _init();
+      _init(colorSet, pageController, voted);
       return null;
-    }, []);
+    }, [question]);
     useEffect(() {
       _vote(voted, asyncVoted);
       return null;
@@ -219,14 +228,14 @@ class WhichWidget extends HookConsumerWidget {
               question: asyncQuestion,
               counter: asyncCounter,
               isLeft: true,
-              colorSet: colorSet,
+              colorSet: colorSet.value,
               pageController: pageController,
               voted: asyncVoted ?? false,
             ),
             CenterWidget(
               myData: myData,
               question: asyncQuestion,
-              colorSet: colorSet,
+              colorSet: colorSet.value,
               pageController: pageController,
             ),
             SideWidget(
@@ -234,7 +243,7 @@ class WhichWidget extends HookConsumerWidget {
               question: asyncQuestion,
               counter: asyncCounter,
               isLeft: false,
-              colorSet: colorSet,
+              colorSet: colorSet.value,
               pageController: pageController,
               voted: asyncVoted ?? false,
             ),
