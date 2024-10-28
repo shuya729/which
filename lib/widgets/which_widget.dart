@@ -209,11 +209,11 @@ class WhichWidget extends HookConsumerWidget {
     useEffect(() {
       _init(colorSet, pageController, voted);
       return null;
-    }, [question]);
+    }, [question, myData]);
     useEffect(() {
       _vote(voted, asyncVoted);
       return null;
-    }, [voted.value, asyncVoted]);
+    }, [myData, voted.value, asyncVoted]);
 
     return Stack(
       fit: StackFit.expand,

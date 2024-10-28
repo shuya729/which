@@ -2,29 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:which/models/indexes.dart';
-import 'package:which/models/question.dart';
-import 'package:which/models/user_data.dart';
-import 'package:which/providers/user_stream_provider.dart';
-import 'package:which/views/create_screen.dart';
 import 'package:which/widgets/loading_widget.dart';
-import 'package:which/widgets/which_widget.dart';
 
 abstract class ScreenBase extends HookConsumerWidget {
   const ScreenBase({super.key});
 
-  @protected
   String get title;
-  @protected
-  bool? get allowAnonymous => null;
-  @protected
   bool get initLoading => false;
 
   @protected
-  Widget userBuild(
+  Widget baseBuild(
     BuildContext context,
     WidgetRef ref,
-    UserData myData,
     ValueNotifier<bool> loading,
     ValueNotifier<String> asyncPath,
     ValueNotifier<String> asyncMsg,
@@ -82,29 +71,7 @@ abstract class ScreenBase extends HookConsumerWidget {
       return null;
     }, [asyncMsg.value]);
 
-    final AsyncValue<UserData> myData = ref.watch(userStreamProvider);
-    return myData.when<Widget>(
-      data: (UserData data) {
-        if (allowAnonymous == true && !data.anonymousFlg) {
-          return dispTemp(
-            msg: '不正な画面遷移です。',
-          );
-        } else if (allowAnonymous == false && data.anonymousFlg) {
-          return dispTemp(msg: 'ログインが必要です。');
-        } else {
-          return userBuild(
-            context,
-            ref,
-            data,
-            loading,
-            asyncPath,
-            asyncMsg,
-          );
-        }
-      },
-      loading: () => loadingTemp(),
-      error: (_, __) => dispTemp(msg: '認証時にエラーが発生しました。'),
-    );
+    return baseBuild(context, ref, loading, asyncPath, asyncMsg);
   }
 
   Widget textTemp({
@@ -319,182 +286,6 @@ abstract class ScreenBase extends HookConsumerWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _nullWidget(void Function() refresh, double diff) {
-    return SafeArea(
-      child: Center(
-        child: IconButton(
-          onPressed: refresh,
-          icon: AnimatedOpacity(
-            opacity: diff == 0 ? 1 : 0,
-            duration: const Duration(milliseconds: 400),
-            child: const Icon(
-              Icons.refresh,
-              size: 40,
-              color: Colors.grey,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget questionsTemp({
-    required bool loading,
-    required ValueNotifier<String> asyncMsg,
-    required UserData myData,
-    int? itemCount,
-    required PageController pageController,
-    required List<Question?> questions,
-    required Indexes indexes,
-    required double diff,
-    required void Function(int) onPageChanged,
-    required void Function() refreshFunction,
-    required void Function() reloadFunciton,
-    required Widget Function(BuildContext context, BoxConstraints constraints)
-        topBuilder,
-    Widget? drawer,
-    Widget? endDrawer,
-  }) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      drawerEnableOpenDragGesture: false,
-      endDrawerEnableOpenDragGesture: false,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          PageView.builder(
-            controller: pageController,
-            scrollDirection: Axis.vertical,
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: itemCount,
-            onPageChanged: (value) {
-              if (indexes.hasPage(value)) onPageChanged(value);
-            },
-            itemBuilder: (context, index) {
-              if (!indexes.hasPage(index)) {
-                return _nullWidget(refreshFunction, diff);
-              }
-              final int pageIndex = indexes.pageIndex(index);
-              final Question? question = questions[pageIndex];
-              if (question == null) return _nullWidget(refreshFunction, diff);
-              return WhichWidget(
-                myData: myData,
-                question: question,
-                asyncMsg: asyncMsg,
-              );
-            },
-          ),
-          SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      height: constraints.maxHeight * 0.08,
-                      constraints: const BoxConstraints(minHeight: 45),
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: topBuilder(context, constraints),
-                    ),
-                    const Spacer(flex: 80),
-                    Container(
-                      height: constraints.maxHeight * 0.12,
-                      constraints: const BoxConstraints(minHeight: 65),
-                      alignment: Alignment.center,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              if (indexes.current == indexes.top) {
-                                refreshFunction();
-                              } else {
-                                pageController.previousPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              }
-                            },
-                            icon: indexes.current == indexes.top
-                                ? const Icon(Icons.refresh)
-                                : const Icon(Icons.keyboard_arrow_up),
-                            style: IconButton.styleFrom(
-                              foregroundColor: Colors.white70,
-                            ),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              context.push(CreateScreen.absolutePath);
-                            },
-                            label: const Text('作成'),
-                            icon: const Icon(Icons.add),
-                            style: ElevatedButton.styleFrom(
-                              elevation: 2,
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.black87,
-                              minimumSize: const Size(110, 45),
-                              maximumSize: const Size(240, 50),
-                              fixedSize: Size(
-                                constraints.maxWidth * 0.3,
-                                constraints.maxHeight * 0.07,
-                              ),
-                              textStyle: const TextStyle(fontSize: 18),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              if (indexes.current == indexes.bottom) {
-                                reloadFunciton();
-                              } else {
-                                pageController.nextPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              }
-                            },
-                            icon: indexes.current == indexes.bottom
-                                ? const Icon(Icons.refresh)
-                                : const Icon(Icons.keyboard_arrow_down),
-                            style: IconButton.styleFrom(
-                              foregroundColor: Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-          IgnorePointer(
-            ignoring: true,
-            child: Container(
-              color: Colors.white.withOpacity((diff * 4).clamp(0, 0.4)),
-            ),
-          ),
-          loading
-              ? ModalBarrier(
-                  dismissible: false,
-                  color: Colors.white60,
-                )
-              : const SizedBox(),
-          AnimatedOpacity(
-            opacity: loading ? 1 : 0,
-            duration: const Duration(milliseconds: 100),
-            child: const LoadingWidget(),
-          ),
-        ],
-      ),
-      drawer: drawer,
-      endDrawer: endDrawer,
     );
   }
 }

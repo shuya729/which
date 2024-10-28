@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/utils/screen_base.dart';
+import 'package:which/utils/user_screen_base.dart';
 import 'package:which/views/home_screen.dart';
 
-class SignoutScreen extends ScreenBase {
+class SignoutScreen extends UserScreenBase {
   const SignoutScreen({super.key});
 
   @override

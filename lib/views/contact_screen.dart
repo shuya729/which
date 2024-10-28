@@ -5,9 +5,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/services/contact_service.dart';
-import 'package:which/utils/screen_base.dart';
+import 'package:which/utils/user_screen_base.dart';
 
-class ContactScreen extends ScreenBase {
+class ContactScreen extends UserScreenBase {
   const ContactScreen({super.key});
 
   @override

@@ -2,19 +2,17 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/circle_indexes.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/providers/indexes_provider.dart';
 import 'package:which/providers/questions_provider.dart';
-import 'package:which/providers/user_stream_provider.dart';
-import 'package:which/utils/screen_base.dart';
+import 'package:which/utils/user_screen_base.dart';
 import 'package:which/widgets/drawer_widget.dart';
 import 'package:which/widgets/end_drawer_widget.dart';
 
-class HomeScreen extends ScreenBase {
+class HomeScreen extends UserScreenBase {
   const HomeScreen({super.key, required this.id});
   final String? id;
 
@@ -41,13 +39,22 @@ class HomeScreen extends ScreenBase {
     PageController pageController,
   ) async {
     value = value.trim();
-    if (value.isEmpty) return;
-    final List<Question?>? ret = await showFutureLoading(
-      loading,
-      asyncMsg,
-      questionsNotifier.searchQuestions(input: value),
-      message: '検索に失敗しました。',
-    );
+    late final List<Question?>? ret;
+    if (value.isNotEmpty) {
+      ret = await showFutureLoading(
+        loading,
+        asyncMsg,
+        questionsNotifier.searchQuestions(input: value),
+        message: '検索に失敗しました。',
+      );
+    } else {
+      ret = await showFutureLoading(
+        loading,
+        asyncMsg,
+        questionsNotifier.refreshQuestions(),
+        message: 'データの取得に失敗しました。',
+      );
+    }
     if (ret != null && ret.isEmpty) {
       asyncMsg.value = '質問が見つかりませんでした。';
     } else {
@@ -96,51 +103,6 @@ class HomeScreen extends ScreenBase {
     if (ret != null && ret.isEmpty) asyncMsg.value = '質問が見つかりませんでした。';
   }
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ValueNotifier<bool> loading = useState(initLoading);
-    final ValueNotifier<String> asyncPath = useState('');
-    useEffect(() {
-      if (asyncPath.value.isNotEmpty) context.go(asyncPath.value);
-      return null;
-    }, [asyncPath.value]);
-    final ValueNotifier<String> asyncMsg = useState('');
-    useEffect(() {
-      if (asyncMsg.value.isNotEmpty) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showMsgBar(context, asyncMsg.value);
-        });
-      }
-      return null;
-    }, [asyncMsg.value]);
-
-    final QuestionsNotifier questionsNotifier =
-        ref.read(questionsProvider.notifier);
-    final AsyncValue<UserData> myData = ref.watch(userStreamProvider);
-    return myData.when<Widget>(
-      data: (UserData data) {
-        if (allowAnonymous == true && !data.anonymousFlg) {
-          return dispTemp(msg: '不正な画面遷移です。');
-        } else if (allowAnonymous == false && data.anonymousFlg) {
-          return dispTemp(msg: 'ログインが必要です。');
-        } else {
-          final future =
-              useMemoized(() => questionsNotifier.initQuestions(id: id), [id]);
-          final AsyncSnapshot<void> asyncFuture = useFuture(future);
-          if (asyncFuture.hasError) {
-            return dispTemp(msg: 'データの取得に失敗しました。');
-          } else if (asyncFuture.connectionState == ConnectionState.done) {
-            return userBuild(context, ref, data, loading, asyncPath, asyncMsg);
-          } else {
-            return loadingTemp();
-          }
-        }
-      },
-      loading: () => loadingTemp(),
-      error: (_, __) => dispTemp(msg: '認証時にエラーが発生しました。'),
-    );
-  }
-
   void _listener(
     double hieight,
     ValueNotifier<bool> loading,
@@ -186,6 +148,28 @@ class HomeScreen extends ScreenBase {
 
   @override
   Widget userBuild(
+    BuildContext context,
+    WidgetRef ref,
+    UserData myData,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+  ) {
+    final QuestionsNotifier questionsNotifier =
+        ref.read(questionsProvider.notifier);
+    final future =
+        useMemoized(() => questionsNotifier.initQuestions(id: id), [id]);
+    final AsyncSnapshot<void> asyncFuture = useFuture(future);
+    if (asyncFuture.hasError) {
+      return dispTemp(msg: 'データの取得に失敗しました。');
+    } else if (asyncFuture.connectionState == ConnectionState.done) {
+      return _userBuild(context, ref, myData, loading, asyncPath, asyncMsg);
+    } else {
+      return loadingTemp();
+    }
+  }
+
+  Widget _userBuild(
     BuildContext context,
     WidgetRef ref,
     UserData myData,

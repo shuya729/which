@@ -5,11 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:which/models/user_data.dart';
-import 'package:which/utils/screen_base.dart';
+import 'package:which/utils/user_screen_base.dart';
 import 'package:which/views/home_screen.dart';
 import 'package:which/views/regist_screen.dart';
 
-class SigninScreen extends ScreenBase {
+class SigninScreen extends UserScreenBase {
   const SigninScreen({super.key});
 
   @override

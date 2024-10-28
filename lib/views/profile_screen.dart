@@ -7,9 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/services/storage_service.dart';
 import 'package:which/services/user_service.dart';
-import 'package:which/utils/screen_base.dart';
+import 'package:which/utils/user_screen_base.dart';
 
-class ProfileScreen extends ScreenBase {
+class ProfileScreen extends UserScreenBase {
   const ProfileScreen({super.key});
 
   @override

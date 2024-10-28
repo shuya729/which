@@ -8,9 +8,9 @@ import 'package:which/models/indexes.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/services/question_service.dart';
-import 'package:which/utils/screen_base.dart';
+import 'package:which/utils/user_screen_base.dart';
 
-class CreatedScreen extends ScreenBase {
+class CreatedScreen extends UserScreenBase {
   const CreatedScreen({super.key});
 
   @override

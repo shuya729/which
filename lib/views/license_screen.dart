@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:which/models/user_data.dart';
 import 'package:which/utils/screen_base.dart';
 
 class LicenseScreen extends ScreenBase {
@@ -28,10 +27,9 @@ class LicenseScreen extends ScreenBase {
   }
 
   @override
-  Widget userBuild(
+  Widget baseBuild(
     BuildContext context,
     WidgetRef ref,
-    UserData myData,
     ValueNotifier<bool> loading,
     ValueNotifier<String> asyncPath,
     ValueNotifier<String> asyncMsg,
@@ -82,10 +80,9 @@ class LicenceDetailScreen extends ScreenBase {
   }
 
   @override
-  Widget userBuild(
+  Widget baseBuild(
     BuildContext context,
     WidgetRef ref,
-    UserData myData,
     ValueNotifier<bool> loading,
     ValueNotifier<String> asyncPath,
     ValueNotifier<String> asyncMsg,

@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:which/models/remote_config.dart';
 import 'package:which/models/terms.dart';
-import 'package:which/models/user_data.dart';
+import 'package:which/providers/config_provider.dart';
+import 'package:which/services/storage_service.dart';
 import 'package:which/utils/screen_base.dart';
 
 class TermScreen extends ScreenBase {
@@ -18,31 +17,53 @@ class TermScreen extends ScreenBase {
   @override
   bool get initLoading => true;
 
-  Future<List<Terms>> _getTerms() async {
-    final String data = await rootBundle.loadString('assets/terms/term.json');
-    final Map<String, dynamic> jsonData =
-        jsonDecode(data) as Map<String, dynamic>;
-    final List<dynamic> jsonList = jsonData['contents'] as List<dynamic>;
-    return jsonList
-        .map<Terms>((v) => Terms.fromJson(v as Map<String, dynamic>))
-        .toList();
+  Future<List<Terms?>> getTerms(RemoteConfig remoteConfig) async {
+    final StorageService storageService = StorageService();
+    final String termPath = remoteConfig.termPath;
+    return await storageService.getTerm(termPath);
   }
 
   @override
-  Widget userBuild(
+  Widget baseBuild(
     BuildContext context,
     WidgetRef ref,
-    UserData myData,
     ValueNotifier<bool> loading,
     ValueNotifier<String> asyncPath,
     ValueNotifier<String> asyncMsg,
   ) {
-    final future = useMemoized(
-      () => showFutureLoading(loading, asyncMsg, _getTerms()),
-    );
-    final AsyncSnapshot<List<Terms>?> asyncSnapshot = useFuture(future);
+    final AsyncValue<RemoteConfig> asyncRemote =
+        ref.watch(remoteConfigProvider);
+    if (asyncRemote.hasError) {
+      return dispTemp(msg: '設定の取得に失敗しました。');
+    } else if (asyncRemote.value == null) {
+      return loadingTemp();
+    } else {
+      final RemoteConfig remoteConfig = asyncRemote.value!;
+      return _baseBuild(
+        context,
+        ref,
+        loading,
+        asyncPath,
+        asyncMsg,
+        remoteConfig,
+      );
+    }
+  }
 
-    final List<Terms> terms = asyncSnapshot.data ?? [];
+  Widget _baseBuild(
+    BuildContext context,
+    WidgetRef ref,
+    ValueNotifier<bool> loading,
+    ValueNotifier<String> asyncPath,
+    ValueNotifier<String> asyncMsg,
+    RemoteConfig remoteConfig,
+  ) {
+    final future = useMemoized(
+      () => showFutureLoading(loading, asyncMsg, getTerms(remoteConfig)),
+    );
+    final AsyncSnapshot<List<Terms?>?> asyncSnapshot = useFuture(future);
+
+    final List<Terms?> terms = asyncSnapshot.data ?? [];
     return textTemp(
       loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -51,7 +72,8 @@ class TermScreen extends ScreenBase {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: terms.length,
           itemBuilder: (context, index) {
-            final Terms term = terms[index];
+            final Terms? term = terms[index];
+            if (term == null) return null;
             return Padding(
               padding: EdgeInsets.only(
                 top: term.type == 'content' ? 5 : 30,

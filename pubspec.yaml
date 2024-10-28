@@ -52,6 +52,8 @@ dependencies:
   cloud_functions:
   flutter_native_splash:
   flutter_launcher_icons:
+  package_info_plus:
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:
@@ -81,8 +83,6 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - assets/terms/term.json
-    - assets/terms/privacy.json
     - assets/system/google_logo.png
     - assets/system/apple_logo.png
     - assets/system/person.png
