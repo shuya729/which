@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:which/models/contact.dart';
-import 'package:which/models/user_data.dart';
 
 class ContactService {
   static CollectionReference get collection =>
@@ -9,7 +8,7 @@ class ContactService {
       collection.doc(contactId);
 
   Future<void> set({
-    required UserData userData,
+    required String uid,
     required String name,
     required String email,
     required int subject,
@@ -19,7 +18,7 @@ class ContactService {
     await doc.set(
       Contact.forSet(
         doc.id,
-        userData.authId,
+        uid,
         name,
         email,
         subject,

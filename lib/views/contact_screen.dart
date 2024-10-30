@@ -1,13 +1,13 @@
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:which/models/user_data.dart';
 import 'package:which/services/contact_service.dart';
-import 'package:which/utils/user_screen_base.dart';
+import 'package:which/utils/screen_base.dart';
 
-class ContactScreen extends UserScreenBase {
+class ContactScreen extends ScreenBase {
   const ContactScreen({super.key});
 
   @override
@@ -16,21 +16,21 @@ class ContactScreen extends UserScreenBase {
   static const String relativePath = 'contact';
 
   Future<void> _addContact({
-    required UserData myData,
     required TextEditingController nameController,
     required TextEditingController emailController,
     required ValueNotifier<int> subjectValue,
     required TextEditingController contentController,
     required ValueNotifier<String> asyncMsg,
   }) async {
+    final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
     await ContactService().set(
-      userData: myData,
+      uid: uid,
       name: nameController.text,
       email: emailController.text,
       subject: subjectValue.value,
       content: contentController.text,
     );
-    nameController.text = myData.name;
+    nameController.clear();
     emailController.clear();
     contentController.clear();
     subjectValue.value = 0;
@@ -38,17 +38,15 @@ class ContactScreen extends UserScreenBase {
   }
 
   @override
-  Widget userBuild(
+  Widget baseBuild(
     BuildContext context,
     WidgetRef ref,
-    UserData myData,
     ValueNotifier<bool> loading,
     ValueNotifier<String> asyncPath,
     ValueNotifier<String> asyncMsg,
   ) {
     final GlobalKey<FormState> formKey = useState(GlobalKey<FormState>()).value;
-    final TextEditingController nameController =
-        useTextEditingController(text: myData.name);
+    final TextEditingController nameController = useTextEditingController();
     final TextEditingController emailController = useTextEditingController();
     final TextEditingController contentController = useTextEditingController();
     final ValueNotifier<int> subjectValue = useState(0);
@@ -247,7 +245,6 @@ class ContactScreen extends UserScreenBase {
                         loading,
                         asyncMsg,
                         _addContact(
-                          myData: myData,
                           nameController: nameController,
                           emailController: emailController,
                           subjectValue: subjectValue,

@@ -128,7 +128,7 @@ service cloud.firestore {
       && data.contactId is string
       && data.contactId == contactId
       && data.authId is string
-      && data.authId == request.auth.uid
+      && (data.authId == request.auth.uid || data.authId == '')
       && (!data.keys().hasAny(['name']) || data.name is string)
       && (!data.keys().hasAny(['email']) || data.email is string)
       && (!data.keys().hasAny(['subject']) || data.subject is int)
@@ -204,7 +204,7 @@ service cloud.firestore {
 
     // Contacts
     match /contacts/{contactId} {
-      allow create: if isAuthed() && validContacts(contactId);
+      allow create: if validContacts(contactId);
     }
 
   }
