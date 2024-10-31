@@ -24,9 +24,6 @@ class DrawerWidget extends HookConsumerWidget {
         padding: const EdgeInsets.only(bottom: 40),
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-            ),
             child: Center(
               child: Text(
                 'メニュー',

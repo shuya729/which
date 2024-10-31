@@ -24,7 +24,8 @@ export const deleteUserFunc = async (
 
   const bucket = storage.bucket();
   const userBucket = bucket.file(`users/${authId}/icon.jpg`);
-  if (await userBucket.exists()) await userBucket.delete();
+  const [bucketExists] = await userBucket.exists();
+  if (bucketExists) await userBucket.delete();
 
   const batchSize = 100;
   const subCollections = await userRef.listCollections();

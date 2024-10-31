@@ -25,6 +25,7 @@ class MyApp extends HookConsumerWidget {
     final GoRouter router = ref.watch(routerProvider);
 
     return MaterialApp.router(
+      // debugShowCheckedModeBanner: false, // サンプル用
       title: 'BiPick',
       theme: ThemeData(
         fontFamily: 'NotoSansJP',

@@ -193,9 +193,19 @@ class WhichWidget extends HookConsumerWidget {
     final Future<Question?> futureQuestion =
         useMemoized(() => _getQuestion(), [question]);
     final Question asyncQuestion = useFuture(futureQuestion).data ?? question;
+    // final Question asyncQuestion = // サンプル用
+    //     (useFuture(futureQuestion).data ?? question).copyWith(
+    //   quest: '男女の友情は成立する？',
+    //   answer1: '成立する',
+    //   answer2: '成立しない',
+    // );
     final Stream<Counter?> streamCounter =
         useMemoized(() => _getCounterStream(), [question]);
     final Counter? asyncCounter = useStream(streamCounter).data;
+    // final Counter? asyncCounter = useStream(streamCounter).data?.copyWith( // サンプル用
+    //       answer1: 28,
+    //       answer2: 53,
+    //     );
     final Future<UserData?> futureUser =
         useMemoized(() => _getUser(), [question]);
     final UserData? asyncUser = useFuture(futureUser).data;

@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1098469953657-dph52l2sgm56iir3lo5dbbjt63a5kqut.apps.googleusercontent.com</string>
+	<string>1098469953657-296ue5ap8blmkmjhedhcmlm7h84b3egv.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1098469953657-dph52l2sgm56iir3lo5dbbjt63a5kqut</string>
+	<string>com.googleusercontent.apps.1098469953657-296ue5ap8blmkmjhedhcmlm7h84b3egv</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1098469953657-82sbs76lvgl46cmsdhaam672cbneptcr.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyB8fMVcChGMz9ETEgqeP-a4osnW0GSiLD4</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.which</string>
+	<string>com.which464.which</string>
 	<key>PROJECT_ID</key>
 	<string>which-464</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1098469953657:ios:97bc8be343a3c4ccb9c4a8</string>
+	<string>1:1098469953657:ios:5e7569601be32366b9c4a8</string>
 </dict>
 </plist>
