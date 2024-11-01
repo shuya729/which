@@ -32,13 +32,14 @@ export class Counter {
 
   /**
    * ドキュメントの配列からCounterインスタンスを生成します。
+   * @param {string} questionId - 質問のID
    * @param {Array<FirebaseFirestore.QueryDocumentSnapshot>} docs - ドキュメントの配列
    * @return {Counter} Counterインスタンス
    */
   static fromDocs(
+    questionId: string,
     docs: Array<FirebaseFirestore.QueryDocumentSnapshot>
   ): Counter {
-    const questionId = docs[0].data().questionId;
     let readed = 0;
     let watched = 0;
     let answer1 = 0;
@@ -47,10 +48,10 @@ export class Counter {
     docs.forEach((doc) => {
       const data = doc.data();
       if (data.questionId === questionId) {
-        readed += data.readed;
-        watched += data.watched;
-        answer1 += data.answer1;
-        answer2 += data.answer2;
+        readed += data.readed ?? 0;
+        watched += data.watched ?? 0;
+        answer1 += data.answer1 ?? 0;
+        answer2 += data.answer2 ?? 0;
       }
     });
 

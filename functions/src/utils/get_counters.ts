@@ -14,7 +14,7 @@ export const getCounters = async (
     (question) => question.questionId
   );
 
-  for (let i = 0; i < questionIds.length / 30; i++) {
+  for (let i = 0; i < Math.ceil(questionIds.length / 30); i++) {
     const questionIdsSlice = questionIds.slice(i * 30, (i + 1) * 30);
     const counterQuery = counterCollectionGroup.where(
       "questionId",
@@ -25,10 +25,10 @@ export const getCounters = async (
     if (counterSnapshots.empty) continue;
 
     for (const questionId of questionIdsSlice) {
-      const docs = counterSnapshots.docs.find(
+      const docs = counterSnapshots.docs.filter(
         (doc) => doc.data().questionId === questionId
       );
-      if (docs) counters.push(Counter.fromDocs([docs]));
+      if (docs) counters.push(Counter.fromDocs(questionId, docs));
     }
   }
 

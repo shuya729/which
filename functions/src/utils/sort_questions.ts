@@ -78,23 +78,17 @@ export const sortQuestions = (
       const score = scoreMap.get(question.questionId);
       if (!score) return;
       const embeddingIndex = embeddingOrderIds.indexOf(question.questionId);
-      if (embeddingIndex && embeddingIndex >= 0 && embeddingRate > 0) {
-        score.setEmbeddingScore(
-          calcScore(embeddingIndex, questions.length, embeddingRate)
-        );
-      }
+      score.setEmbeddingScore(
+        calcScore(embeddingIndex, questions.length, embeddingRate)
+      );
       const latestIndex = latestOrderIds.indexOf(question.questionId);
-      if (latestIndex && latestIndex >= 0 && latestRate > 0) {
-        score.setLatestScore(
-          calcScore(latestIndex, questions.length, latestRate)
-        );
-      }
+      score.setLatestScore(
+        calcScore(latestIndex, questions.length, latestRate)
+      );
       const popularIndex = popularOrderIds.indexOf(question.questionId);
-      if (popularIndex && popularIndex >= 0 && popularRate > 0) {
-        score.setPopularScore(
-          calcScore(popularIndex, questions.length, popularRate)
-        );
-      }
+      score.setPopularScore(
+        calcScore(popularIndex, questions.length, popularRate)
+      );
       scoreMap.set(question.questionId, score);
     });
   }
