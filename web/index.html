@@ -1,4 +1,6 @@
-<!DOCTYPE html><html><head>
+<!DOCTYPE html>
+<html>
+  <head>
     <!--
     If you are serving your web app in a path other than the root, change the
     href value below to reflect the base path you are serving from.
@@ -12,100 +14,143 @@
     This is a placeholder for base href that will be replaced by the value of
     the `--base-href` argument provided to `flutter build`.
   -->
-    <base href="$FLUTTER_BASE_HREF">
+    <base href="$FLUTTER_BASE_HREF" />
 
-    <meta charset="UTF-8">
-    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-    <meta name="description" content="which project">
+    <meta charset="UTF-8" />
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
 
     <!-- icons -->
-    <link rel="icon" href="icons/favicon.ico" sizes="32x32" type="image/vnd.microsoft.icon">
-    <link rel="icon" href="icons/bipick_logo_origin_favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="icons/bipick_logo_learge_apple-touch-icon.png">
+    <link
+      rel="icon"
+      href="icons/favicon.ico"
+      sizes="32x32"
+      type="image/vnd.microsoft.icon"
+    />
+    <link
+      rel="icon"
+      href="icons/bipick_logo_origin_favicon.svg"
+      type="image/svg+xml"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="icons/bipick_logo_learge_apple-touch-icon.png"
+    />
 
     <title>BiPick</title>
-    <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+    <meta
+      name="description"
+      content="BiPickは、恋愛、趣味、日常生活など多彩なテーマの２択質問を気軽に投稿・閲覧できる共有サービスです。「旅行なら海派？山派？」などシンプルな質問から、深い人生の選択まで、誰でも楽しめる究極の質問が集まります。気になる質問に答えて他のユーザーの選択結果もリアルタイムで確認可能。簡単に使えるBiPickで、新しい発見や楽しい議論を気軽に体験しよう！"
+    />
+    <link rel="manifest" href="manifest.json" crossorigin="use-credentials" />
 
     <!-- cropperjs -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
-    
-  
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-  <style id="splash-screen-style">
-    html {
-      height: 100%
-    }
 
-    body {
-      margin: 0;
-      min-height: 100%;
-      background-color: #ffffff;
-          background-size: 100% 100%;
-    }
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      name="viewport"
+    />
+    <style id="splash-screen-style">
+      html {
+        height: 100%;
+      }
 
-    .center {
-      margin: 0;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      -ms-transform: translate(-50%, -50%);
-      transform: translate(-50%, -50%);
-    }
+      body {
+        margin: 0;
+        min-height: 100%;
+        background-color: #ffffff;
+        background-size: 100% 100%;
+      }
 
-    .contain {
-      display:block;
-      width:100%; height:100%;
-      object-fit: contain;
-    }
+      .center {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+      }
 
-    .stretch {
-      display:block;
-      width:100%; height:100%;
-    }
+      .contain {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
 
-    .cover {
-      display:block;
-      width:100%; height:100%;
-      object-fit: cover;
-    }
+      .stretch {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
 
-    .bottom {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      -ms-transform: translate(-50%, 0);
-      transform: translate(-50%, 0);
-    }
+      .cover {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
 
-    .bottomLeft {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-    }
+      .bottom {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        -ms-transform: translate(-50%, 0);
+        transform: translate(-50%, 0);
+      }
 
-    .bottomRight {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-    }
-  </style>
-  <script id="splash-screen-script">
-    function removeSplashFromWeb() {
-      document.getElementById("splash")?.remove();
-      document.getElementById("splash-branding")?.remove();
-      document.body.style.background = "transparent";
-    }
-  </script>
-</head>
+      .bottomLeft {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+
+      .bottomRight {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+      }
+    </style>
+    <script id="splash-screen-script">
+      function removeSplashFromWeb() {
+        document.getElementById("splash")?.remove();
+        document.getElementById("splash-branding")?.remove();
+        document.body.style.background = "transparent";
+      }
+    </script>
+  </head>
   <body>
-  <picture id="splash">
-      <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
-      <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
-      <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
-  </picture>
-  
-    <script src="flutter_bootstrap.js" async=""></script>
-  
+    <picture id="splash">
+      <source
+        srcset="
+          splash/img/light-1x.png 1x,
+          splash/img/light-2x.png 2x,
+          splash/img/light-3x.png 3x,
+          splash/img/light-4x.png 4x
+        "
+        media="(prefers-color-scheme: light)"
+      />
+      <source
+        srcset="
+          splash/img/dark-1x.png 1x,
+          splash/img/dark-2x.png 2x,
+          splash/img/dark-3x.png 3x,
+          splash/img/dark-4x.png 4x
+        "
+        media="(prefers-color-scheme: dark)"
+      />
+      <img
+        class="center"
+        aria-hidden="true"
+        src="splash/img/light-1x.png"
+        alt=""
+      />
+    </picture>
 
-</body></html>
+    <script src="flutter_bootstrap.js" async=""></script>
+  </body>
+</html>

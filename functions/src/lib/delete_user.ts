@@ -1,21 +1,13 @@
 import { deleteCollection } from "../utils/delete_collections";
 import { user } from "firebase-functions/v1/auth";
-import { Firestore, getFirestore } from "firebase-admin/firestore";
-import { Storage, getStorage } from "firebase-admin/storage";
+import { getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 
 export const deleteUser = user().onDelete(async (user) => {
   const authId = user.uid;
   const db = getFirestore();
   const storage = getStorage();
 
-  await deleteUserFunc(authId, db, storage);
-});
-
-export const deleteUserFunc = async (
-  authId: string,
-  db: Firestore,
-  storage: Storage
-): Promise<void> => {
   const userRef = db.collection("users").doc(authId);
   await userRef.delete();
 
@@ -32,4 +24,4 @@ export const deleteUserFunc = async (
   for (const subCollection of subCollections) {
     await deleteCollection(db, subCollection, batchSize);
   }
-};
+});
