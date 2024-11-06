@@ -13,6 +13,7 @@ import 'package:which/utils/screen_base.dart';
 import 'package:which/views/create_screen.dart';
 import 'package:which/widgets/loading_widget.dart';
 import 'package:which/widgets/terms_dialog.dart';
+import 'package:which/widgets/which_ad_widget.dart';
 import 'package:which/widgets/which_widget.dart';
 
 abstract class UserScreenBase extends ScreenBase {
@@ -153,15 +154,18 @@ abstract class UserScreenBase extends ScreenBase {
             itemBuilder: (context, index) {
               if (!indexes.hasPage(index)) {
                 return _nullWidget(refreshFunction, diff);
+              } else if (indexes.showAd(index)) {
+                return WhichAdWidget(asyncMsg: asyncMsg);
+              } else {
+                final int pageIndex = indexes.pageIndex(index);
+                final Question? question = questions[pageIndex];
+                if (question == null) return _nullWidget(refreshFunction, diff);
+                return WhichWidget(
+                  myData: myData,
+                  question: question,
+                  asyncMsg: asyncMsg,
+                );
               }
-              final int pageIndex = indexes.pageIndex(index);
-              final Question? question = questions[pageIndex];
-              if (question == null) return _nullWidget(refreshFunction, diff);
-              return WhichWidget(
-                myData: myData,
-                question: question,
-                asyncMsg: asyncMsg,
-              );
             },
           ),
           SafeArea(

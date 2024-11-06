@@ -54,6 +54,7 @@ dependencies:
   flutter_launcher_icons:
   package_info_plus:
   shared_preferences:
+  google_mobile_ads:
 
 dev_dependencies:
   flutter_test:

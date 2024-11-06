@@ -1,0 +1,217 @@
+<com.google.android.gms.ads.nativead.NativeAdView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical">
+
+    <!-- ad_headline Container -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center|top"
+        android:layout_weight="17"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="5dp">
+
+      <androidx.cardview.widget.CardView
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_gravity="center"
+          android:background="@android:color/white"
+          android:elevation="1dp"
+          app:cardCornerRadius="10dp">
+
+        <TextView
+            android:id="@+id/ad_headline"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:text="ad_headline"
+            android:textColor="@android:color/black"
+            android:textSize="26sp" />
+      </androidx.cardview.widget.CardView>
+
+    </FrameLayout>
+
+    <!-- ad_body Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="22"
+        android:gravity="end|center_vertical"
+        android:padding="10dp">
+
+      <Space
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="0.3"
+          tools:ignore="NestedWeights" />
+
+      <TextView
+          android:id="@+id/ad_body"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="0.7"
+          android:gravity="center"
+          android:padding="10dp"
+          android:text="ad_body"
+          android:textColor="@android:color/white"
+          android:textSize="26sp" />
+    </LinearLayout>
+
+    <!-- Navigation Buttons Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="6"
+        android:orientation="horizontal">
+
+      <ImageButton
+          android:layout_width="wrap_content"
+          android:layout_height="34dp"
+          android:background="#00FFFFFF"
+          android:contentDescription="Back"
+          android:paddingHorizontal="10dp"
+          android:src="@drawable/baseline_arrow_back_ios_20"
+          android:tint="@android:color/white"
+          tools:ignore="TouchTargetSizeCheck" />
+
+      <Space
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          tools:ignore="NestedWeights" />
+
+      <ImageButton
+          android:layout_width="wrap_content"
+          android:layout_height="34dp"
+          android:background="#00FFFFFF"
+          android:contentDescription="Forward"
+          android:paddingHorizontal="10dp"
+          android:src="@drawable/baseline_arrow_forward_ios_20"
+          android:tint="@android:color/white"
+          tools:ignore="TouchTargetSizeCheck" />
+    </LinearLayout>
+
+    <!-- ad_call_to_action Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="22"
+        android:gravity="start|center_vertical"
+        android:padding="10dp">
+
+      <TextView
+          android:id="@+id/ad_call_to_action"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="0.7"
+          android:gravity="center"
+          android:padding="10dp"
+          android:text="ad_call_to_action"
+          android:textColor="@android:color/white"
+          android:textSize="26sp"
+          tools:ignore="NestedWeights" />
+
+      <Space
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="0.3" />
+    </LinearLayout>
+
+    <!-- ad_advertiser Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="13"
+        android:gravity="start|bottom"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+
+      <androidx.cardview.widget.CardView
+          android:layout_width="0dp"
+          android:layout_height="76dp"
+          android:layout_weight="0.45"
+          app:cardCornerRadius="10dp"
+          tools:ignore="NestedWeights">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#3DFFFFFF"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+          <ImageView
+              android:id="@+id/ad_app_icon"
+              android:layout_width="40dp"
+              android:layout_height="40dp"
+              android:layout_gravity="center_vertical"
+              android:background="#73000000"
+              android:padding="2dp" />
+
+          <LinearLayout
+              android:layout_width="0dp"
+              android:layout_height="match_parent"
+              android:layout_marginStart="10dp"
+              android:layout_weight="1"
+              android:orientation="vertical"
+              android:paddingVertical="6dp">
+
+            <TextView
+                android:id="@+id/ad_advertiser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:gravity="start|top"
+                android:maxLines="1"
+                android:text="ad_advertiser"
+                android:textColor="@android:color/black"
+                android:textSize="14sp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="26dp"
+                android:layout_height="10dp"
+                android:layout_gravity="bottom|start"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="6dp">
+
+              <TextView
+                  android:id="@+id/textView"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:background="@android:color/black"
+                  android:gravity="center"
+                  android:text="Ad"
+                  android:textColor="@android:color/white"
+                  android:textSize="11sp"
+                  tools:ignore="TextSizeCheck" />
+            </androidx.cardview.widget.CardView>
+
+          </LinearLayout>
+        </LinearLayout>
+      </androidx.cardview.widget.CardView>
+
+      <Space
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="0.55" />
+
+    </LinearLayout>
+
+  </LinearLayout>
+
+</com.google.android.gms.ads.nativead.NativeAdView>

@@ -63,6 +63,10 @@ class Indexes {
     return page;
   }
 
+  bool showAd(int page) {
+    return false;
+  }
+
   // hashCode
   @override
   int get hashCode =>

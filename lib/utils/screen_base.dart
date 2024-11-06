@@ -31,7 +31,6 @@ abstract class ScreenBase extends HookConsumerWidget {
       loading.value = false;
       return ret;
     } catch (e) {
-      print(e);
       loading.value = false;
       asyncMsg.value = message;
       return null;
