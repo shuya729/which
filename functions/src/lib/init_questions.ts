@@ -6,6 +6,7 @@ import { Question } from "../models/question";
 export const initQuestions = onCall(
   {
     region: "asia-northeast1",
+    enforceAppCheck: true,
   },
   async (request) => {
     const authId = request.auth?.uid;

@@ -35,7 +35,7 @@ class CreateScreen extends UserScreenBase {
       answer1: answer1Vlaue,
       answer2: answer2Value,
     );
-    if (context.mounted) context.pop();
+    if (context.mounted && context.canPop()) context.pop();
   }
 
   @override
@@ -54,7 +54,7 @@ class CreateScreen extends UserScreenBase {
     final colorSet = useState(ColorSet.set());
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(size: 18),
+        leading: CloseButton(style: IconButton.styleFrom(iconSize: 18)),
         title: Text(
           title,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),

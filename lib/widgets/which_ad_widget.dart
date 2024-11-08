@@ -13,8 +13,8 @@ class WhichAdWidget extends HookConsumerWidget {
 
   Future<NativeAd> _createNativeAd(ValueNotifier<bool> loaded) async {
     final String unitId = Platform.isAndroid
-        ? 'ca-app-pub-3940256099942544/2247696110'
-        : 'ca-app-pub-3940256099942544/3986624511';
+        ? 'ca-app-pub-9057495563597980/3551288300'
+        : 'ca-app-pub-9057495563597980/4225945844';
     final NativeAd ad = NativeAd(
       adUnitId: unitId,
       factoryId: 'whichAdFactory',

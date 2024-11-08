@@ -29,7 +29,11 @@ class TermsDialog extends HookConsumerWidget {
     return AlertDialog(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      title: const Text('ご利用前に', textAlign: TextAlign.center),
+      title: const Text(
+        'ご利用前に',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontFamily: "NotoSansJP"),
+      ),
       titleTextStyle: const TextStyle(
         color: Colors.black,
         fontSize: 18,
@@ -51,7 +55,11 @@ class TermsDialog extends HookConsumerWidget {
               },
               title: RichText(
                 text: TextSpan(
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontFamily: "NotoSansJP",
+                  ),
                   children: [
                     TextSpan(
                       text: '利用規約',
@@ -79,7 +87,11 @@ class TermsDialog extends HookConsumerWidget {
               },
               title: RichText(
                 text: TextSpan(
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontFamily: "NotoSansJP",
+                  ),
                   children: [
                     TextSpan(
                       text: 'プライバシーポリシー',

@@ -14,19 +14,16 @@
       ]
     },
     {
-      "collectionGroup": "embeddings",
+      "collectionGroup": "infos",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "questionId",
+          "fieldPath": "anonymousFlg",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "embedding",
-          "vectorConfig": {
-            "dimension": 1536,
-            "flat": {}
-          }
+          "fieldPath": "lastAt",
+          "order": "ASCENDING"
         }
       ]
     },

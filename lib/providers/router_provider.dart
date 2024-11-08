@@ -5,6 +5,7 @@ import 'package:which/views/contact_screen.dart';
 import 'package:which/views/create_screen.dart';
 import 'package:which/views/created_screen.dart';
 import 'package:which/views/delete_screen.dart';
+import 'package:which/views/notfound_screen.dart';
 import 'package:which/views/home_screen.dart';
 import 'package:which/views/license_screen.dart';
 import 'package:which/views/privacy_screen.dart';
@@ -20,7 +21,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     routes: [
       GoRoute(
-        path: HomeScreen.relativePath,
+        path: HomeScreen.absolutePath,
         builder: (context, state) {
           final String? id = state.uri.queryParameters['id'];
           return HomeScreen(id: id);
@@ -65,34 +66,35 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: SavedScreen.relativePath,
             builder: (context, state) => const SavedScreen(),
           ),
+        ],
+      ),
+      GoRoute(
+        path: TermScreen.absolutePath,
+        builder: (context, state) => const TermScreen(),
+      ),
+      GoRoute(
+        path: PrivacyScreen.absolutePath,
+        builder: (context, state) => const PrivacyScreen(),
+      ),
+      GoRoute(
+        path: LicenseScreen.absolutePath,
+        builder: (context, state) => const LicenseScreen(),
+        routes: [
           GoRoute(
-            path: TermScreen.relativePath,
-            builder: (context, state) => const TermScreen(),
-          ),
-          GoRoute(
-            path: PrivacyScreen.relativePath,
-            builder: (context, state) => const PrivacyScreen(),
-          ),
-          GoRoute(
-            path: LicenseScreen.relativePath,
-            builder: (context, state) => const LicenseScreen(),
-            routes: [
-              GoRoute(
-                path: LicenceDetailScreen.relativePath,
-                builder: (context, state) {
-                  return LicenceDetailScreen(
-                    package: state.pathParameters['package']!,
-                  );
-                },
-              ),
-            ],
-          ),
-          GoRoute(
-            path: ContactScreen.relativePath,
-            builder: (context, state) => const ContactScreen(),
+            path: LicenseDetailScreen.relativePath,
+            builder: (context, state) {
+              return LicenseDetailScreen(
+                package: state.pathParameters['package']!,
+              );
+            },
           ),
         ],
       ),
+      GoRoute(
+        path: ContactScreen.absolutePath,
+        builder: (context, state) => const ContactScreen(),
+      ),
     ],
+    errorBuilder: (context, state) => const NotfoundScreen(),
   );
 });

@@ -10,8 +10,8 @@ class LicenseScreen extends ScreenBase {
 
   @override
   String get title => 'ライセンス情報';
-  static const String absolutePath = '/licence';
-  static const String relativePath = 'licence';
+  static const String absolutePath = '/license';
+  static const String relativePath = 'license';
   @override
   bool get initLoading => true;
 
@@ -41,6 +41,7 @@ class LicenseScreen extends ScreenBase {
 
     final List<String> packages = asyncSnapshot.data ?? [];
     return listTemp(
+      context: context,
       loading: loading.value,
       itemCount: packages.length,
       itemBuilder:
@@ -48,7 +49,7 @@ class LicenseScreen extends ScreenBase {
         final String package = packages[index];
         return ListTile(
           title: Text(package),
-          onTap: () => context.push(LicenceDetailScreen.absolutePath(package)),
+          onTap: () => context.push(LicenseDetailScreen.absolutePath(package)),
           trailing: const Icon(
             Icons.arrow_forward_ios,
             size: 14,
@@ -59,13 +60,13 @@ class LicenseScreen extends ScreenBase {
   }
 }
 
-class LicenceDetailScreen extends ScreenBase {
-  const LicenceDetailScreen({super.key, required this.package});
+class LicenseDetailScreen extends ScreenBase {
+  const LicenseDetailScreen({super.key, required this.package});
   final String package;
 
   @override
   String get title => package;
-  static String absolutePath(String package) => '/licence/$package';
+  static String absolutePath(String package) => '/license/$package';
   static const String relativePath = ':package';
 
   Future<List<List<LicenseParagraph>>> _getParagraphs() async {
@@ -94,11 +95,12 @@ class LicenceDetailScreen extends ScreenBase {
         useFuture(future);
 
     if (asyncSnapshot.hasData && asyncSnapshot.data!.isEmpty) {
-      return dispTemp(msg: 'ライセンス情報はありません。');
+      return dispTemp(context: context, msg: 'ライセンス情報はありません。');
     }
 
     final List<List<LicenseParagraph>> paragraphs = asyncSnapshot.data ?? [];
     return textTemp(
+      context: context,
       loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return ListView.separated(

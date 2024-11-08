@@ -69,39 +69,10 @@
     </LinearLayout>
 
     <!-- Navigation Buttons Container -->
-    <LinearLayout
+    <Space
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="6"
-        android:orientation="horizontal">
-
-      <ImageButton
-          android:layout_width="wrap_content"
-          android:layout_height="34dp"
-          android:background="#00FFFFFF"
-          android:contentDescription="Back"
-          android:paddingHorizontal="10dp"
-          android:src="@drawable/baseline_arrow_back_ios_20"
-          android:tint="@android:color/white"
-          tools:ignore="TouchTargetSizeCheck" />
-
-      <Space
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          tools:ignore="NestedWeights" />
-
-      <ImageButton
-          android:layout_width="wrap_content"
-          android:layout_height="34dp"
-          android:background="#00FFFFFF"
-          android:contentDescription="Forward"
-          android:paddingHorizontal="10dp"
-          android:src="@drawable/baseline_arrow_forward_ios_20"
-          android:tint="@android:color/white"
-          tools:ignore="TouchTargetSizeCheck" />
-    </LinearLayout>
+        android:layout_weight="6" />
 
     <!-- ad_call_to_action Container -->
     <LinearLayout
@@ -141,14 +112,14 @@
       <androidx.cardview.widget.CardView
           android:layout_width="0dp"
           android:layout_height="76dp"
-          android:layout_weight="0.45"
+          android:layout_weight="0.5"
+          android:background="#3DFFFFFF"
           app:cardCornerRadius="10dp"
           tools:ignore="NestedWeights">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#3DFFFFFF"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="10dp">
@@ -208,7 +179,7 @@
       <Space
           android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:layout_weight="0.55" />
+          android:layout_weight="0.5" />
 
     </LinearLayout>
 

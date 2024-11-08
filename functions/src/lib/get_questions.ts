@@ -5,6 +5,7 @@ import { getQuestionsSet } from "../utils/get_questions_set";
 export const getQuestions = onCall(
   {
     region: "asia-northeast1",
+    enforceAppCheck: true,
   },
   async (request) => {
     const authId = request.auth?.uid;

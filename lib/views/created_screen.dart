@@ -9,6 +9,7 @@ import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/services/question_service.dart';
 import 'package:which/utils/user_screen_base.dart';
+import 'package:which/views/home_screen.dart';
 
 class CreatedScreen extends UserScreenBase {
   const CreatedScreen({super.key});
@@ -200,7 +201,7 @@ class CreatedScreen extends UserScreenBase {
 
     if (asyncSnapshot.connectionState == ConnectionState.done &&
         questions.value.isEmpty) {
-      return dispTemp(msg: '$titleの質問はありません。');
+      return dispTemp(context: context, msg: '$titleの質問はありません。');
     }
 
     return questionsTemp(
@@ -242,15 +243,27 @@ class CreatedScreen extends UserScreenBase {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new),
-                onPressed: () => context.pop(),
-                style: IconButton.styleFrom(
-                  iconSize: 18,
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.white24,
-                ),
-              ),
+              context.canPop()
+                  ? BackButton(
+                      style: IconButton.styleFrom(
+                        iconSize: 18,
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white24,
+                      ),
+                    )
+                  : IconButton(
+                      onPressed: () => context.go(HomeScreen.absolutePath),
+                      icon: Image.asset(
+                        'assets/system/bipick_logo.png',
+                        width: 28,
+                        height: 28,
+                      ),
+                      style: IconButton.styleFrom(
+                        padding: const EdgeInsets.all(0),
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white24,
+                      ),
+                    ),
               const SizedBox(width: 10),
               Flexible(
                 fit: FlexFit.tight,

@@ -416,7 +416,7 @@ class WhichWidget extends HookConsumerWidget {
                                     onPressed: () {
                                       Share.shareUri(
                                         Uri.parse(
-                                          'https://which-464.web.app/?id=${asyncQuestion.questionId}',
+                                          'https://bipick.net/?id=${asyncQuestion.questionId}',
                                         ),
                                         sharePositionOrigin: Rect.fromCenter(
                                           center: Offset.zero,
