@@ -20,7 +20,6 @@ export class Embedding {
     this.embedding = (data.embedding as VectorValue).toArray();
   }
 
-  /* toFirestore */
   /**
    * toFirestore メソッドは、Firestore に保存するデータを返します。
    * @return {FirebaseFirestore.DocumentData} Firestore に保存するデータ

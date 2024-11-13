@@ -1,4 +1,5 @@
-import { Timestamp } from "firebase-admin/firestore";
+import { UserRecord } from "firebase-admin/auth";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 
 /**
  * Question クラスは、質問に関する情報を保持します。
@@ -25,5 +26,19 @@ export class UserInfo {
     this.userId = data.userId ?? "";
     this.lastAt = data.lastAt ?? Timestamp.now();
     this.anonymousFlg = data.anonymousFlg ?? false;
+  }
+
+  /**
+   * forCreate メソッドは、ユーザー情報を作成するためのデータを返します。
+   * @param {UserRecord} user - ユーザー情報
+   * @return {FirebaseFirestore.DocumentData} ユーザー情報を作成するためのデータ
+   */
+  static forCreate(user: UserRecord): FirebaseFirestore.DocumentData {
+    return {
+      authId: user.uid,
+      userId: user.uid,
+      lastAt: FieldValue.serverTimestamp(),
+      anonymousFlg: true,
+    };
   }
 }
