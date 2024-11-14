@@ -7,6 +7,7 @@ import { deleteQuestion } from "./lib/delete_question";
 import { createUser } from "./lib/create_user";
 import { deleteUser } from "./lib/delete_user";
 import { userCrawler } from "./lib/user_crawler";
+import { notifyContact } from "./lib/notify_contact";
 
 initializeApp();
 
@@ -21,3 +22,4 @@ export { deleteQuestion };
 export { createUser };
 export { deleteUser };
 export { userCrawler };
+export { notifyContact };
