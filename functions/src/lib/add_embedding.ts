@@ -4,6 +4,7 @@ import { OpenAI } from "openai";
 import { createEmbedding } from "../utils/create_embedding";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { Embedding } from "../models/embedding";
+import { logger } from "firebase-functions/v2";
 
 export const addEmbedding = onDocumentCreated(
   {
@@ -15,6 +16,9 @@ export const addEmbedding = onDocumentCreated(
     const data = event.data?.data();
     if (!data) return;
     const question = new Question(data);
+
+    logger.info(`Added question: ${question.questionId}`);
+
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const input: string =
       "Q: " +

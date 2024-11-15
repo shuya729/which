@@ -2,6 +2,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { onCall } from "firebase-functions/v2/https";
 import { getQuestionsSet } from "../utils/get_questions_set";
 import { Question } from "../models/question";
+import { logger } from "firebase-functions/v2";
 
 export const initQuestions = onCall(
   {
@@ -12,6 +13,8 @@ export const initQuestions = onCall(
     const authId = request.auth?.uid;
     const initQuestionId = request.data?.questionId;
     if (!authId) return [];
+
+    logger.info(`authId: ${authId}, initQuestionId: ${initQuestionId}`);
 
     const db = getFirestore();
     const questionsSet = await getQuestionsSet(authId, db);

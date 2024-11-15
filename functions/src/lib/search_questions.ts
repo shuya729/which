@@ -7,6 +7,7 @@ import { Embedding } from "../models/embedding";
 import { sortQuestions } from "../utils/sort_questions";
 import { getCounters } from "../utils/get_counters";
 import { Counter } from "../models/counter";
+import { logger } from "firebase-functions/v2";
 
 export const searchQuestions = onCall(
   {
@@ -18,6 +19,8 @@ export const searchQuestions = onCall(
     const authId = request.auth?.uid;
     const input: string = request.data?.input;
     if (!authId || !input || input.length === 0) return [];
+
+    logger.info(`authId: ${authId}, input: ${input}`);
 
     const embeddingRate = 0.72;
     const latestRate = 0.14;

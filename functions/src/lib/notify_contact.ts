@@ -1,6 +1,7 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import * as https from "https";
 import { Contact } from "../models/contact";
+import { logger } from "firebase-functions/v2";
 
 export const notifyContact = onDocumentCreated(
   {
@@ -33,7 +34,11 @@ export const notifyContact = onDocumentCreated(
         "Authorization": `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}`,
       },
     };
-    const req = https.request(url, options, (res) => res.setEncoding("utf8"));
+    const req = https.request(url, options, (res) => {
+      res.setEncoding("utf8");
+      res.on("data", (chunk) => logger.info(`Send to LINE: ${chunk}`));
+    });
+    req.on("error", (error) => logger.error(`Send to LINE error: ${error}`));
     req.write(postData);
     req.end();
   }
