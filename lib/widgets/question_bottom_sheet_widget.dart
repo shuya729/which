@@ -40,10 +40,10 @@ class QuestionBottomSheetWidget extends HookConsumerWidget {
   }
 
   // Future<void> _test(BuildContext context) async {
-  //   Navigator.of(context).pop();
   //   try {} catch (e) {
   //     print(e);
   //   }
+  //   if (context.mounted) Navigator.of(context).pop();
   // }
 
   @override

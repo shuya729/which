@@ -113,7 +113,6 @@ class CreatedScreen extends UserScreenBase {
     ValueNotifier<Indexes> indexes,
     PageController pageController,
   ) async {
-    print('reload');
     final int page = pageController.page?.round() ?? 0;
     pageController.animateToPage(
       page,
