@@ -5,8 +5,8 @@ import 'package:which/models/user_data.dart';
 import 'package:which/services/question_service.dart';
 import 'package:which/services/report_question_service.dart';
 
-class BottomSheetWidget extends HookConsumerWidget {
-  const BottomSheetWidget({
+class QuestionBottomSheetWidget extends HookConsumerWidget {
+  const QuestionBottomSheetWidget({
     super.key,
     required this.myData,
     required this.question,

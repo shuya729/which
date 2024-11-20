@@ -32,12 +32,13 @@
             android:id="@+id/ad_headline"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:ellipsize="end"
             android:gravity="center"
             android:paddingHorizontal="12dp"
             android:paddingVertical="8dp"
             android:text="ad_headline"
             android:textColor="#000000"
-            android:textSize="26sp" />
+            android:textSize="25sp" />
       </androidx.cardview.widget.CardView>
 
     </FrameLayout>
@@ -61,11 +62,12 @@
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_weight="0.7"
+          android:ellipsize="end"
           android:gravity="center"
           android:padding="10dp"
           android:text="ad_body"
           android:textColor="#FFFFFF"
-          android:textSize="26sp" />
+          android:textSize="25sp" />
     </LinearLayout>
 
     <!-- Navigation Buttons Container -->
@@ -87,11 +89,12 @@
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_weight="0.7"
+          android:ellipsize="end"
           android:gravity="center"
           android:padding="10dp"
           android:text="ad_call_to_action"
           android:textColor="#FFFFFF"
-          android:textSize="26sp"
+          android:textSize="25sp"
           tools:ignore="NestedWeights" />
 
       <Space

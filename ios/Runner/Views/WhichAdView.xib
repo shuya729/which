@@ -20,18 +20,23 @@
                         <view contentMode="top" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wq5-yh-FgD" userLabel="View1">
                             <rect key="frame" x="0.0" y="0.0" width="393" height="132.66666666666666"/>
                             <subviews>
-                                <view contentMode="center" translatesAutoresizingMaskIntoConstraints="NO" id="dbE-wt-WV9">
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dbE-wt-WV9">
                                     <rect key="frame" x="10" y="5.0000000000000071" width="373" height="122.66666666666669"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="headline" text="ad_headline" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WOx-Rv-5s4">
-                                            <rect key="frame" x="127" y="50" width="138" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="26"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" restorationIdentifier="headline" text="ad_headline" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WOx-Rv-5s4">
+                                            <rect key="frame" x="12" y="8" width="349" height="107"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="WOx-Rv-5s4" secondAttribute="trailing" constant="12" id="0CP-7c-Y7E"/>
+                                        <constraint firstItem="WOx-Rv-5s4" firstAttribute="top" secondItem="dbE-wt-WV9" secondAttribute="top" constant="8" id="Iub-3D-9V3"/>
+                                        <constraint firstAttribute="bottom" secondItem="WOx-Rv-5s4" secondAttribute="bottom" constant="8" id="hHB-Sn-Zqv"/>
+                                        <constraint firstItem="WOx-Rv-5s4" firstAttribute="leading" secondItem="dbE-wt-WV9" secondAttribute="leading" constant="12" id="xXD-X0-mr5"/>
+                                    </constraints>
                                     <userDefinedRuntimeAttributes>
                                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
                                             <integer key="value" value="10"/>
@@ -47,15 +52,15 @@
                                 <constraint firstItem="dbE-wt-WV9" firstAttribute="top" secondItem="wq5-yh-FgD" secondAttribute="top" constant="5" id="grA-cE-SkS"/>
                             </constraints>
                         </view>
-                        <stackView opaque="NO" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="GJx-ev-XLA" userLabel="Stack View2">
+                        <stackView opaque="NO" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GJx-ev-XLA" userLabel="Stack View2">
                             <rect key="frame" x="0.0" y="132.66666666666669" width="393" height="171.66666666666669"/>
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MB3-PY-rbR">
                                     <rect key="frame" x="0.0" y="0.0" width="115" height="171.66666666666666"/>
                                 </view>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" restorationIdentifier="ad_body" text="ad_body" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d9d-hS-dKl">
-                                    <rect key="frame" x="115" y="70" width="268" height="31.333333333333329"/>
-                                    <fontDescription key="fontDescription" type="system" pointSize="26"/>
+                                    <rect key="frame" x="115" y="0.0" width="268" height="171.66666666666666"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <nil key="highlightedColor"/>
                                 </label>
@@ -86,7 +91,7 @@
                                 </view>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" restorationIdentifier="ad_call_to_action" text="ad_call_to_action" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eMl-m2-ZPH">
                                     <rect key="frame" x="10" y="0.0" width="268" height="171.66666666666666"/>
-                                    <fontDescription key="fontDescription" type="system" pointSize="26"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <nil key="highlightedColor"/>
                                 </label>

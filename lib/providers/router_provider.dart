@@ -16,6 +16,7 @@ import 'package:which/views/setup_screen.dart';
 import 'package:which/views/signin_screen.dart';
 import 'package:which/views/signout_screen.dart';
 import 'package:which/views/term_screen.dart';
+import 'package:which/views/users_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -65,6 +66,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: SavedScreen.relativePath,
             builder: (context, state) => const SavedScreen(),
+          ),
+          GoRoute(
+            path: UsersScreen.relativePath,
+            builder: (context, state) {
+              return UsersScreen(authId: state.pathParameters['authId']!);
+            },
           ),
         ],
       ),

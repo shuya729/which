@@ -9,6 +9,7 @@ import 'package:which/models/color_set.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/services/question_service.dart';
 import 'package:which/utils/user_screen_base.dart';
+import 'package:which/views/home_screen.dart';
 
 class CreateScreen extends UserScreenBase {
   const CreateScreen({super.key});
@@ -29,13 +30,13 @@ class CreateScreen extends UserScreenBase {
     final questValue = questController.text.trim();
     final answer1Vlaue = answer1Controller.text.trim();
     final answer2Value = answer2Controller.text.trim();
-    await QuestionService().add(
+    final String questionId = await QuestionService().add(
       userData: myData,
       quest: questValue,
       answer1: answer1Vlaue,
       answer2: answer2Value,
     );
-    if (context.mounted && context.canPop()) context.pop();
+    if (context.mounted) context.go(HomeScreen.createPath(questionId));
   }
 
   @override

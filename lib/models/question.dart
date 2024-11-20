@@ -15,6 +15,7 @@ class Question {
     required this.rejectedFlg,
     required this.creAt,
     required this.updAt,
+    required this.lastAt,
   });
 
   final String questionId;
@@ -28,6 +29,7 @@ class Question {
   final bool rejectedFlg;
   final DateTime creAt;
   final DateTime updAt;
+  final DateTime lastAt; // savedのcreAtを保持するため
 
   static Map<String, dynamic> forSet(
     String questionId,
@@ -69,6 +71,9 @@ class Question {
       updAt: DateTime.fromMillisecondsSinceEpoch(
         ((data['updAt'] as Map?)?['_seconds'] as int?) ?? 0 * 1000,
       ),
+      lastAt: DateTime.fromMillisecondsSinceEpoch(
+        ((data['creAt'] as Map?)?['_seconds'] as int?) ?? 0 * 1000,
+      ),
     );
   }
 
@@ -86,6 +91,7 @@ class Question {
       rejectedFlg: data['rejectedFlg'] as bool? ?? false,
       creAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updAt: (data['updAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastAt: (data['creAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
@@ -102,6 +108,7 @@ class Question {
     bool? rejectedFlg,
     DateTime? creAt,
     DateTime? updAt,
+    DateTime? lastAt,
   }) {
     return Question(
       questionId: questionId ?? this.questionId,
@@ -115,6 +122,7 @@ class Question {
       rejectedFlg: rejectedFlg ?? this.rejectedFlg,
       creAt: creAt ?? this.creAt,
       updAt: updAt ?? this.updAt,
+      lastAt: lastAt ?? this.lastAt,
     );
   }
 
@@ -131,7 +139,8 @@ class Question {
       deletedFlg.hashCode ^
       rejectedFlg.hashCode ^
       creAt.hashCode ^
-      updAt.hashCode;
+      updAt.hashCode ^
+      lastAt.hashCode;
 
   // operator ==
   @override
@@ -149,6 +158,7 @@ class Question {
         deletedFlg == otherQuestion.deletedFlg &&
         rejectedFlg == otherQuestion.rejectedFlg &&
         creAt == otherQuestion.creAt &&
-        updAt == otherQuestion.updAt;
+        updAt == otherQuestion.updAt &&
+        lastAt == otherQuestion.lastAt;
   }
 }
