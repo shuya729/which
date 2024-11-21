@@ -3,6 +3,7 @@ import { onCall } from "firebase-functions/v2/https";
 import { getQuestionsSet } from "../utils/get_questions_set";
 import { Question } from "../models/question";
 import { logger } from "firebase-functions/v2";
+import { cacheQuestions } from "../utils/cache_questions";
 
 export const initQuestions = onCall(
   {
@@ -34,6 +35,8 @@ export const initQuestions = onCall(
         }
       }
     }
+
+    await cacheQuestions(db, authId, questionsSet.slice(0, 40));
 
     return questionsSet.slice(0, 40);
   }

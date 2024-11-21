@@ -12,7 +12,6 @@ import 'package:which/models/user_data.dart';
 import 'package:which/models/vote.dart';
 import 'package:which/services/counter_service.dart';
 import 'package:which/services/question_service.dart';
-import 'package:which/services/readed_service.dart';
 import 'package:which/services/saved_service.dart';
 import 'package:which/services/user_service.dart';
 import 'package:which/services/voted_service.dart';
@@ -45,9 +44,7 @@ class WhichWidget extends HookConsumerWidget {
       voted.value = 0;
     }
     try {
-      final ReadedService readedService = ReadedService();
       final CounterService counterService = CounterService();
-      await readedService.set(userData: myData, question: question);
       await counterService.increment(question, incrementRead: true);
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';

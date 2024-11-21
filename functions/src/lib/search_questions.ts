@@ -8,6 +8,7 @@ import { sortQuestions } from "../utils/sort_questions";
 import { getCounters } from "../utils/get_counters";
 import { Counter } from "../models/counter";
 import { logger } from "firebase-functions/v2";
+import { cacheQuestions } from "../utils/cache_questions";
 
 export const searchQuestions = onCall(
   {
@@ -81,6 +82,8 @@ export const searchQuestions = onCall(
       latestRate,
       popularRate
     );
+
+    await cacheQuestions(db, authId, sortedQuestions.slice(0, 40));
 
     return sortedQuestions.slice(0, 40);
   }
