@@ -34,7 +34,7 @@ class TermScreen extends ScreenBase {
     final AsyncValue<RemoteConfig> asyncRemote =
         ref.watch(remoteConfigProvider);
     if (asyncRemote.hasError) {
-      return dispTemp(msg: '設定の取得に失敗しました。');
+      return dispTemp(context: context, msg: '設定の取得に失敗しました。');
     } else if (asyncRemote.value == null) {
       return loadingTemp();
     } else {
@@ -65,6 +65,7 @@ class TermScreen extends ScreenBase {
 
     final List<Terms?> terms = asyncSnapshot.data ?? [];
     return textTemp(
+      context: context,
       loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return ListView.builder(

@@ -17,13 +17,13 @@ class SavedScreen extends CreatedScreen {
 
   @override
   Future<List<Question?>> initQuestions(
-    UserData myData,
+    ValueNotifier<UserData> userData,
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
     final SavedService savedService = SavedService();
     final List<Question> saveds = await savedService.getSaveds(
-      userData: myData,
+      userData: userData.value,
     );
     questions.value = [...saveds];
     indexes.value = indexes.value.loaded(saveds.length);
@@ -32,14 +32,14 @@ class SavedScreen extends CreatedScreen {
 
   @override
   Future<List<Question?>> getQuestions(
-    UserData myData,
+    UserData userData,
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
     indexes.value = indexes.value.loading();
     final SavedService savedService = SavedService();
     final List<Question> saveds = await savedService.getSaveds(
-      userData: myData,
+      userData: userData,
       last: questions.value.last,
     );
     final List<Question?> preQuestions = questions.value;
@@ -53,13 +53,13 @@ class SavedScreen extends CreatedScreen {
 
   @override
   Future<List<Question?>> refreshQuestions(
-    UserData myData,
+    UserData userData,
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
     final SavedService savedService = SavedService();
     final List<Question> saveds = await savedService.getSaveds(
-      userData: myData,
+      userData: userData,
     );
     questions.value = [...saveds];
     indexes.value = Indexes().loaded(saveds.length);

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:which/models/indexes.dart';
 
 @immutable
@@ -32,8 +32,6 @@ class CircleIndexes extends Indexes {
     if (bottom != null) {
       top = _calcTop(this.top, this.bottom, bottom);
     }
-    print(
-        'top: ${(top ?? this.top) % limit}, current: ${(current ?? this.current) % limit}, bottom: ${(bottom ?? this.bottom) % limit}, load: ${(load ?? this.load) % limit}, multiplier: ${multiplier ?? this.multiplier}');
     return CircleIndexes(
       top: top ?? this.top,
       current: current ?? this.current,
@@ -68,6 +66,15 @@ class CircleIndexes extends Indexes {
         this.current >= top ? this.current : this.current + limit;
     final int load = this.load >= top ? this.load : this.load + limit;
     return current > load;
+  }
+
+  @override
+  bool showAd(final int page) {
+    if (!kIsWeb && page % loadCount == 18) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @override

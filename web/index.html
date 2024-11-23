@@ -19,6 +19,13 @@
     <meta charset="UTF-8" />
     <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
 
+    <!-- AppCheck(初回起動時のみ) -->
+    <!-- <script src="https://www.google.com/recaptcha/enterprise.js?render=6LerfHgqAAAAAIGmsrw8HtpvJ5Y2QsrfblzoqX2h"></script> -->
+    <!-- AppCheck debug token(普段はコメントアウト) -->
+    <!-- <script>
+      self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    </script> -->
+
     <!-- icons -->
     <link
       rel="icon"
@@ -121,6 +128,21 @@
         document.getElementById("splash-branding")?.remove();
         document.body.style.background = "transparent";
       }
+    </script>
+
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=AW-16637780013"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "AW-16637780013");
     </script>
   </head>
   <body>

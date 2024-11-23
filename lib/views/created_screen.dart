@@ -9,6 +9,7 @@ import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/services/question_service.dart';
 import 'package:which/utils/user_screen_base.dart';
+import 'package:which/views/home_screen.dart';
 
 class CreatedScreen extends UserScreenBase {
   const CreatedScreen({super.key});
@@ -23,42 +24,42 @@ class CreatedScreen extends UserScreenBase {
   bool get initLoading => true;
 
   Future<List<Question?>> initQuestions(
-    UserData myData,
+    ValueNotifier<UserData> userData,
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
     final QuestionService questionService = QuestionService();
     final List<Question> createds = await questionService.getCreateds(
-      userData: myData,
+      userData: userData.value,
     );
     questions.value = [...createds];
     indexes.value = indexes.value.loaded(createds.length);
     return createds;
   }
 
-  Future<void> onPageChanged(
+  Future<void> _onPageChanged(
     int value,
     ValueNotifier<Indexes> indexes,
-    UserData myData,
+    UserData userData,
     ValueNotifier<List<Question?>> questions,
   ) async {
     try {
       indexes.value = indexes.value.changePage(value);
       if (indexes.value.canLoad()) {
-        await getQuestions(myData, questions, indexes);
+        await getQuestions(userData, questions, indexes);
       }
     } catch (_) {}
   }
 
   Future<List<Question?>> getQuestions(
-    UserData myData,
+    UserData userData,
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
     indexes.value = indexes.value.loading();
     final QuestionService questionService = QuestionService();
     final List<Question> createds = await questionService.getCreateds(
-      userData: myData,
+      userData: userData,
       last: questions.value.last,
     );
     final List<Question?> preQuestions = questions.value;
@@ -73,7 +74,7 @@ class CreatedScreen extends UserScreenBase {
   Future<void> _refresh(
     ValueNotifier<bool> loading,
     ValueNotifier<String> asyncMsg,
-    UserData myData,
+    UserData userData,
     ValueNotifier<List<Question?>> questions,
     PageController pageController,
     ValueNotifier<Indexes> indexes,
@@ -83,7 +84,7 @@ class CreatedScreen extends UserScreenBase {
     final List<Question?>? ret = await showFutureLoading(
       loading,
       asyncMsg,
-      refreshQuestions(myData, questions, indexes),
+      refreshQuestions(userData, questions, indexes),
       message: 'データの取得に失敗しました。',
     );
     if (ret != null && ret.isEmpty) asyncMsg.value = '質問が見つかりませんでした。';
@@ -91,13 +92,13 @@ class CreatedScreen extends UserScreenBase {
   }
 
   Future<List<Question?>> refreshQuestions(
-    UserData myData,
+    UserData userData,
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
   ) async {
     final QuestionService questionService = QuestionService();
     final List<Question> createds = await questionService.getCreateds(
-      userData: myData,
+      userData: userData,
     );
     questions.value = [...createds];
     indexes.value = Indexes().loaded(createds.length);
@@ -107,7 +108,7 @@ class CreatedScreen extends UserScreenBase {
   Future<void> _reload(
     ValueNotifier<bool> loading,
     ValueNotifier<String> asyncMst,
-    UserData myData,
+    UserData userData,
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
     PageController pageController,
@@ -121,7 +122,7 @@ class CreatedScreen extends UserScreenBase {
     final List<Question?>? ret = await showFutureLoading(
       loading,
       asyncMst,
-      getQuestions(myData, questions, indexes),
+      getQuestions(userData, questions, indexes),
       message: 'データの取得に失敗しました。',
     );
     if (ret != null && ret.isEmpty) asyncMst.value = '質問が見つかりませんでした。';
@@ -131,7 +132,7 @@ class CreatedScreen extends UserScreenBase {
     double hieight,
     ValueNotifier<bool> loading,
     ValueNotifier<String> asyncMsg,
-    UserData myData,
+    UserData userData,
     PageController pageController,
     ValueNotifier<List<Question?>> questions,
     ValueNotifier<Indexes> indexes,
@@ -143,7 +144,7 @@ class CreatedScreen extends UserScreenBase {
       if (page == indexes.value.top) {
         final double diffValue = page - position;
         if (diffValue > 0.1 && diff.value <= 0.1) {
-          _refresh(loading, asyncMsg, myData, questions, pageController,
+          _refresh(loading, asyncMsg, userData, questions, pageController,
               indexes, diff);
         }
         diff.value = diffValue;
@@ -151,7 +152,7 @@ class CreatedScreen extends UserScreenBase {
         final diffValue = position - page;
         if (diffValue > 0.1 && diff.value <= 0.1) {
           _reload(
-              loading, asyncMsg, myData, questions, indexes, pageController);
+              loading, asyncMsg, userData, questions, indexes, pageController);
         }
         diff.value = diffValue;
       } else {
@@ -169,6 +170,7 @@ class CreatedScreen extends UserScreenBase {
     ValueNotifier<String> asyncPath,
     ValueNotifier<String> asyncMsg,
   ) {
+    final ValueNotifier<UserData> userData = useState(myData);
     final PageController pageController = usePageController();
     final ValueNotifier<List<Question?>> questions = useState([]);
     final ValueNotifier<Indexes> indexes = useState(const Indexes());
@@ -178,7 +180,7 @@ class CreatedScreen extends UserScreenBase {
             MediaQuery.of(context).size.height,
             loading,
             asyncMsg,
-            myData,
+            userData.value,
             pageController,
             questions,
             indexes,
@@ -186,13 +188,19 @@ class CreatedScreen extends UserScreenBase {
           );
       pageController.addListener(listener);
       return () => pageController.removeListener(listener);
-    }, [myData, pageController, questions.value, indexes.value, diff.value]);
+    }, [
+      userData.value,
+      pageController,
+      questions.value,
+      indexes.value,
+      diff.value,
+    ]);
 
     final future = useMemoized(
       () => showFutureLoading(
         loading,
         asyncMsg,
-        initQuestions(myData, questions, indexes),
+        initQuestions(userData, questions, indexes),
         message: '質問の取得に失敗しました。',
       ),
     );
@@ -200,7 +208,7 @@ class CreatedScreen extends UserScreenBase {
 
     if (asyncSnapshot.connectionState == ConnectionState.done &&
         questions.value.isEmpty) {
-      return dispTemp(msg: '$titleの質問はありません。');
+      return dispTemp(context: context, msg: '$titleの質問が見つかりませんでした。');
     }
 
     return questionsTemp(
@@ -212,16 +220,16 @@ class CreatedScreen extends UserScreenBase {
       questions: questions.value,
       indexes: indexes.value,
       diff: diff.value,
-      onPageChanged: (value) => onPageChanged(
+      onPageChanged: (value) => _onPageChanged(
         value,
         indexes,
-        myData,
+        userData.value,
         questions,
       ),
       refreshFunction: () => _refresh(
         loading,
         asyncMsg,
-        myData,
+        userData.value,
         questions,
         pageController,
         indexes,
@@ -230,7 +238,7 @@ class CreatedScreen extends UserScreenBase {
       reloadFunciton: () => _reload(
         loading,
         asyncMsg,
-        myData,
+        userData.value,
         questions,
         indexes,
         pageController,
@@ -242,15 +250,27 @@ class CreatedScreen extends UserScreenBase {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new),
-                onPressed: () => context.pop(),
-                style: IconButton.styleFrom(
-                  iconSize: 18,
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.white24,
-                ),
-              ),
+              context.canPop()
+                  ? BackButton(
+                      style: IconButton.styleFrom(
+                        iconSize: 18,
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white24,
+                      ),
+                    )
+                  : IconButton(
+                      onPressed: () => context.go(HomeScreen.absolutePath),
+                      icon: Image.asset(
+                        'assets/system/bipick_logo.png',
+                        width: 28,
+                        height: 28,
+                      ),
+                      style: IconButton.styleFrom(
+                        padding: const EdgeInsets.all(0),
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white24,
+                      ),
+                    ),
               const SizedBox(width: 10),
               Flexible(
                 fit: FlexFit.tight,

@@ -7,16 +7,21 @@ import { Embedding } from "../models/embedding";
 import { sortQuestions } from "../utils/sort_questions";
 import { getCounters } from "../utils/get_counters";
 import { Counter } from "../models/counter";
+import { logger } from "firebase-functions/v2";
+import { cacheQuestions } from "../utils/cache_questions";
 
 export const searchQuestions = onCall(
   {
     secrets: ["OPENAI_API_KEY"],
     region: "asia-northeast1",
+    enforceAppCheck: true,
   },
   async (request) => {
     const authId = request.auth?.uid;
     const input: string = request.data?.input;
     if (!authId || !input || input.length === 0) return [];
+
+    logger.info(`authId: ${authId}, input: ${input}`);
 
     const embeddingRate = 0.72;
     const latestRate = 0.14;
@@ -77,6 +82,8 @@ export const searchQuestions = onCall(
       latestRate,
       popularRate
     );
+
+    await cacheQuestions(db, authId, sortedQuestions.slice(0, 40));
 
     return sortedQuestions.slice(0, 40);
   }

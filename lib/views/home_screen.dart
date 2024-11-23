@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -8,6 +9,7 @@ import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/providers/indexes_provider.dart';
 import 'package:which/providers/questions_provider.dart';
+import 'package:which/providers/which_ad_provider.dart';
 import 'package:which/utils/user_screen_base.dart';
 import 'package:which/widgets/drawer_widget.dart';
 import 'package:which/widgets/end_drawer_widget.dart';
@@ -118,7 +120,7 @@ class HomeScreen extends UserScreenBase {
       final double position = pageController.position.pixels / hieight;
       if (page == indexes.top) {
         final double diffValue = page - position;
-        if (diffValue > 0.1 && diff.value <= 0.1) {
+        if (diffValue > 0.15 && diff.value <= 0.15) {
           _refreshQuestions(
             loading,
             asyncMsg,
@@ -131,7 +133,7 @@ class HomeScreen extends UserScreenBase {
         diff.value = diffValue;
       } else if (page == indexes.bottom) {
         final diffValue = position - page;
-        if (diffValue > 0.1 && diff.value <= 0.1) {
+        if (diffValue > 0.15 && diff.value <= 0.15) {
           _reloadQuestions(
             loading,
             asyncMsg,
@@ -161,7 +163,7 @@ class HomeScreen extends UserScreenBase {
         useMemoized(() => questionsNotifier.initQuestions(id: id), [id]);
     final AsyncSnapshot<void> asyncFuture = useFuture(future);
     if (asyncFuture.hasError) {
-      return dispTemp(msg: 'データの取得に失敗しました。');
+      return dispTemp(context: context, msg: 'データの取得に失敗しました。');
     } else if (asyncFuture.connectionState == ConnectionState.done) {
       return _userBuild(context, ref, myData, loading, asyncPath, asyncMsg);
     } else {
@@ -185,6 +187,7 @@ class HomeScreen extends UserScreenBase {
     final IndexesNotifier indexesNotifier = ref.read(indexesProvider.notifier);
     final CircleIndexes indexes = ref.watch(indexesProvider);
     final ValueNotifier<double> diff = useState(0);
+    if (!kIsWeb) ref.watch(whichAdProvider);
 
     useEffect(() {
       listener() => _listener(

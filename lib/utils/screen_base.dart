@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:which/views/home_screen.dart';
 import 'package:which/widgets/loading_widget.dart';
 
 abstract class ScreenBase extends HookConsumerWidget {
@@ -31,7 +32,6 @@ abstract class ScreenBase extends HookConsumerWidget {
       loading.value = false;
       return ret;
     } catch (e) {
-      print(e);
       loading.value = false;
       asyncMsg.value = message;
       return null;
@@ -76,31 +76,38 @@ abstract class ScreenBase extends HookConsumerWidget {
   }
 
   Widget textTemp({
+    required BuildContext context,
     required bool loading,
     required Widget Function(BuildContext context, BoxConstraints constraints)
         builder,
   }) {
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
-      appBar: title.isEmpty
-          ? null
-          : PreferredSize(
-              preferredSize: const Size.fromHeight(45),
-              child: AppBar(
-                iconTheme: const IconThemeData(size: 18),
-                shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(10)),
-                ),
-                title: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(45),
+        child: AppBar(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+          ),
+          leading: context.canPop()
+              ? BackButton(style: IconButton.styleFrom(iconSize: 18))
+              : IconButton(
+                  onPressed: () => context.go(HomeScreen.absolutePath),
+                  icon: Image.asset(
+                    'assets/system/bipick_logo.png',
+                    width: 28,
+                    height: 28,
                   ),
                 ),
-              ),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
             ),
+          ),
+        ),
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -154,6 +161,7 @@ abstract class ScreenBase extends HookConsumerWidget {
   }
 
   Widget listTemp({
+    required BuildContext context,
     required bool loading,
     required int itemCount,
     required Widget Function(
@@ -162,25 +170,31 @@ abstract class ScreenBase extends HookConsumerWidget {
     ScrollController? scrollController,
   }) {
     return Scaffold(
-      appBar: title.isEmpty
-          ? null
-          : PreferredSize(
-              preferredSize: const Size.fromHeight(45),
-              child: AppBar(
-                iconTheme: const IconThemeData(size: 18),
-                shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(10)),
-                ),
-                title: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(45),
+        child: AppBar(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+          ),
+          leading: context.canPop()
+              ? BackButton(style: IconButton.styleFrom(iconSize: 18))
+              : IconButton(
+                  onPressed: () => context.go(HomeScreen.absolutePath),
+                  icon: Image.asset(
+                    'assets/system/bipick_logo.png',
+                    width: 28,
+                    height: 28,
                   ),
                 ),
-              ),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
             ),
+          ),
+        ),
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -230,52 +244,39 @@ abstract class ScreenBase extends HookConsumerWidget {
 
   Widget loadingTemp() {
     return Scaffold(
-      appBar: title.isEmpty
-          ? null
-          : PreferredSize(
-              preferredSize: const Size.fromHeight(45),
-              child: AppBar(
-                iconTheme: const IconThemeData(size: 18),
-                shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(10)),
-                ),
-                title: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
       body: const SafeArea(
         child: LoadingWidget(),
       ),
     );
   }
 
-  Widget dispTemp({required String msg}) {
+  Widget dispTemp({required BuildContext context, required String msg}) {
     return Scaffold(
-      appBar: title.isEmpty
-          ? null
-          : PreferredSize(
-              preferredSize: const Size.fromHeight(45),
-              child: AppBar(
-                iconTheme: const IconThemeData(size: 18),
-                shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(10)),
-                ),
-                title: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(45),
+        child: AppBar(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+          ),
+          leading: context.canPop()
+              ? BackButton(style: IconButton.styleFrom(iconSize: 18))
+              : IconButton(
+                  onPressed: () => context.go(HomeScreen.absolutePath),
+                  icon: Image.asset(
+                    'assets/system/bipick_logo.png',
+                    width: 28,
+                    height: 28,
                   ),
                 ),
-              ),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
             ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),

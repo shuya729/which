@@ -34,6 +34,7 @@ class SignoutScreen extends UserScreenBase {
     ValueNotifier<String> asyncMsg,
   ) {
     return textTemp(
+      context: context,
       loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return Column(

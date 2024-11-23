@@ -106,9 +106,12 @@ class ProfileScreen extends UserScreenBase {
     final bool sameName =
         useValueListenable(nameController).text == myData.name;
 
-    if (screenValidate(myData)) return dispTemp(msg: '不正な画面遷移です。');
+    if (screenValidate(myData)) {
+      return dispTemp(context: context, msg: '不正な画面遷移です。');
+    }
 
     return textTemp(
+      context: context,
       loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return Form(

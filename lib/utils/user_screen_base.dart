@@ -13,6 +13,7 @@ import 'package:which/utils/screen_base.dart';
 import 'package:which/views/create_screen.dart';
 import 'package:which/widgets/loading_widget.dart';
 import 'package:which/widgets/terms_dialog.dart';
+import 'package:which/widgets/which_ad_widget.dart';
 import 'package:which/widgets/which_widget.dart';
 
 abstract class UserScreenBase extends ScreenBase {
@@ -67,26 +68,26 @@ abstract class UserScreenBase extends ScreenBase {
     final AsyncValue<CurrentConfig> asyncCurrent =
         ref.watch(currentConfigProvider);
     if (asyncRemote.hasError || asyncCurrent.hasError) {
-      return dispTemp(msg: '設定の取得に失敗しました。');
+      return dispTemp(context: context, msg: '設定の取得に失敗しました。');
     } else if (asyncRemote.value == null || asyncCurrent.value == null) {
       return loadingTemp();
     } else {
       final RemoteConfig remoteConfig = asyncRemote.value!;
       final CurrentConfig currentConfig = asyncCurrent.value!;
       if (remoteConfig.mantainance) {
-        return dispTemp(msg: '現在メンテナンス中です。');
+        return dispTemp(context: context, msg: '現在メンテナンス中です。');
       } else if (remoteConfig.needUpdate(currentConfig.version)) {
-        return dispTemp(msg: 'アプリを更新してください。');
+        return dispTemp(context: context, msg: 'アプリを更新してください。');
       } else {
         final AsyncValue<UserData> myData = ref.watch(userStreamProvider);
         if (myData.hasError) {
-          return dispTemp(msg: '認証時にエラーが発生しました。');
+          return dispTemp(context: context, msg: '認証時にエラーが発生しました。');
         } else if (myData.value == null) {
           return loadingTemp();
         } else if (allowAnonymous == true && !myData.value!.anonymousFlg) {
-          return dispTemp(msg: '不正な画面遷移です。');
+          return dispTemp(context: context, msg: '不正な画面遷移です。');
         } else if (allowAnonymous == false && myData.value!.anonymousFlg) {
-          return dispTemp(msg: 'ログインが必要です。');
+          return dispTemp(context: context, msg: 'ログインが必要です。');
         } else {
           useEffect(() {
             _showTermsDialog(context, remoteConfig, currentConfig);
@@ -153,15 +154,18 @@ abstract class UserScreenBase extends ScreenBase {
             itemBuilder: (context, index) {
               if (!indexes.hasPage(index)) {
                 return _nullWidget(refreshFunction, diff);
+              } else if (indexes.showAd(index)) {
+                return WhichAdWidget(asyncMsg: asyncMsg);
+              } else {
+                final int pageIndex = indexes.pageIndex(index);
+                final Question? question = questions[pageIndex];
+                if (question == null) return _nullWidget(refreshFunction, diff);
+                return WhichWidget(
+                  myData: myData,
+                  question: question,
+                  asyncMsg: asyncMsg,
+                );
               }
-              final int pageIndex = indexes.pageIndex(index);
-              final Question? question = questions[pageIndex];
-              if (question == null) return _nullWidget(refreshFunction, diff);
-              return WhichWidget(
-                myData: myData,
-                question: question,
-                asyncMsg: asyncMsg,
-              );
             },
           ),
           SafeArea(
@@ -207,7 +211,10 @@ abstract class UserScreenBase extends ScreenBase {
                             onPressed: () {
                               context.push(CreateScreen.absolutePath);
                             },
-                            label: const Text('作成'),
+                            label: const Text(
+                              '作成',
+                              style: TextStyle(fontFamily: "NotoSansJP"),
+                            ),
                             icon: const Icon(Icons.add),
                             style: ElevatedButton.styleFrom(
                               elevation: 2,
@@ -254,7 +261,7 @@ abstract class UserScreenBase extends ScreenBase {
           IgnorePointer(
             ignoring: true,
             child: Container(
-              color: Colors.white.withOpacity((diff * 4).clamp(0, 0.4)),
+              color: Colors.white.withOpacity((diff * 4).clamp(0, 0.6)),
             ),
           ),
           loading

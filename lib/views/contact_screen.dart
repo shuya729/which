@@ -51,6 +51,7 @@ class ContactScreen extends ScreenBase {
     final TextEditingController contentController = useTextEditingController();
     final ValueNotifier<int> subjectValue = useState(0);
     return textTemp(
+      context: context,
       loading: loading.value,
       builder: (BuildContext context, BoxConstraints constraints) {
         return Form(

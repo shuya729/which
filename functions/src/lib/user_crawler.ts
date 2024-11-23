@@ -2,6 +2,7 @@ import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { UserInfo } from "../models/user_info";
 import { getAuth } from "firebase-admin/auth";
+import { logger } from "firebase-functions/v2";
 
 export const userCrawler = onSchedule(
   {
@@ -31,7 +32,12 @@ export const userCrawler = onSchedule(
     });
 
     for (const authId of authIds) {
-      await auth.deleteUser(authId);
+      try {
+        await auth.deleteUser(authId);
+        logger.info(`Deleted user: ${authId}`);
+      } catch (error) {
+        logger.error(`Failed to delete user: ${authId}`, error);
+      }
     }
   }
 );

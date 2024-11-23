@@ -1,5 +1,6 @@
 import { onDocumentDeleted } from "firebase-functions/v2/firestore";
 import { deleteCollection } from "../utils/delete_collections";
+import { logger } from "firebase-functions/v2";
 
 export const deleteQuestion = onDocumentDeleted(
   {
@@ -13,6 +14,8 @@ export const deleteQuestion = onDocumentDeleted(
 
     const ref = data.ref;
     const db = ref.firestore;
+
+    logger.info(`Deleted question: ${ref.id}`);
 
     const embeddingRef = db.collection("embeddings").doc(ref.id);
     await embeddingRef.delete();

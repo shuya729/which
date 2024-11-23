@@ -9,7 +9,7 @@ class QuestionService {
   static DocumentReference doc([String? questionId]) =>
       collection.doc(questionId);
 
-  Future<void> add({
+  Future<String> add({
     required UserData userData,
     required String quest,
     required String answer1,
@@ -23,6 +23,7 @@ class QuestionService {
       answer1,
       answer2,
     ));
+    return doc.id;
   }
 
   Future<void> delete(Question question) async {
@@ -65,7 +66,10 @@ class QuestionService {
       final int index = questions.indexWhere(
         (Question question) => question.questionId == questionId.questionId,
       );
-      if (index != -1) sortedQuestions.add(questions[index]);
+      if (index != -1) {
+        final Question question = questions[index];
+        sortedQuestions.add(question.copyWith(lastAt: questionId.creAt));
+      }
     }
     return sortedQuestions;
   }
@@ -84,7 +88,7 @@ class QuestionService {
       query = collection
           .where('authId', isEqualTo: userData.authId)
           .orderBy('creAt', descending: true)
-          .startAfter([last.creAt]).limit(20);
+          .startAfter([last.lastAt]).limit(20);
     }
     final QuerySnapshot snapshots = await query.get();
     final List<Question> questions = <Question>[];

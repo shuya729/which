@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:which/models/color_set.dart';
@@ -11,14 +12,15 @@ import 'package:which/models/user_data.dart';
 import 'package:which/models/vote.dart';
 import 'package:which/services/counter_service.dart';
 import 'package:which/services/question_service.dart';
-import 'package:which/services/readed_service.dart';
 import 'package:which/services/saved_service.dart';
 import 'package:which/services/user_service.dart';
 import 'package:which/services/voted_service.dart';
 import 'package:which/services/watched_service.dart';
-import 'package:which/widgets/bottom_sheet_widget.dart';
+import 'package:which/views/users_screen.dart';
+import 'package:which/widgets/question_bottom_sheet_widget.dart';
 import 'package:which/widgets/center_widget.dart';
 import 'package:which/widgets/side_widget.dart';
+import 'package:which/widgets/user_bottom_sheet_widget.dart';
 
 class WhichWidget extends HookConsumerWidget {
   const WhichWidget({
@@ -42,9 +44,7 @@ class WhichWidget extends HookConsumerWidget {
       voted.value = 0;
     }
     try {
-      final ReadedService readedService = ReadedService();
       final CounterService counterService = CounterService();
-      await readedService.set(userData: myData, question: question);
       await counterService.increment(question, incrementRead: true);
     } catch (e) {
       asyncMsg.value = 'エラーが発生しました。';
@@ -164,7 +164,7 @@ class WhichWidget extends HookConsumerWidget {
     }
   }
 
-  Future<void> _showBottomSheet(BuildContext context) async {
+  Future<void> _showQuestionBottomSheet(BuildContext context) async {
     await showModalBottomSheet(
       context: context,
       useSafeArea: true,
@@ -177,9 +177,32 @@ class WhichWidget extends HookConsumerWidget {
         ),
       ),
       builder: (context) {
-        return BottomSheetWidget(
+        return QuestionBottomSheetWidget(
           myData: myData,
           question: question,
+          asyncMsg: asyncMsg,
+        );
+      },
+    );
+  }
+
+  Future<void> _showUserBottomSheet(
+      BuildContext context, UserData userData) async {
+    await showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.grey.shade100,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+      ),
+      builder: (context) {
+        return UserBottomSheetWidget(
+          userData: userData,
           asyncMsg: asyncMsg,
         );
       },
@@ -316,7 +339,11 @@ class WhichWidget extends HookConsumerWidget {
                           asyncUser == null || asyncUser.anonymousFlg
                               ? const SizedBox.shrink()
                               : TextButton.icon(
-                                  onPressed: null,
+                                  onPressed: () => context.push(
+                                    UsersScreen.absolutePath(asyncUser.authId),
+                                  ),
+                                  onLongPress: () =>
+                                      _showUserBottomSheet(context, asyncUser),
                                   icon: CircleAvatar(
                                     radius: 20,
                                     backgroundColor: Colors.black45,
@@ -416,7 +443,7 @@ class WhichWidget extends HookConsumerWidget {
                                     onPressed: () {
                                       Share.shareUri(
                                         Uri.parse(
-                                          'https://which-464.web.app/?id=${asyncQuestion.questionId}',
+                                          'https://bipick.net/?id=${asyncQuestion.questionId}',
                                         ),
                                         sharePositionOrigin: Rect.fromCenter(
                                           center: Offset.zero,
@@ -432,7 +459,8 @@ class WhichWidget extends HookConsumerWidget {
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () => _showBottomSheet(context),
+                                    onPressed: () =>
+                                        _showQuestionBottomSheet(context),
                                     icon: const Icon(Icons.more_vert),
                                     style: IconButton.styleFrom(
                                       backgroundColor: Colors.white24,

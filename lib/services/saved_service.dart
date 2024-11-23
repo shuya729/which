@@ -61,7 +61,7 @@ class SavedService {
     } else {
       query = collection(userData.authId)
           .orderBy('creAt', descending: true)
-          .startAfter([last.creAt]).limit(20);
+          .startAfter([last.lastAt]).limit(20);
     }
     final QuerySnapshot snapshots = await query.get();
     final List<QuestionId> questionIds = <QuestionId>[];

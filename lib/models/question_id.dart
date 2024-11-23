@@ -21,18 +21,6 @@ class QuestionId {
     };
   }
 
-  // fromQuestion
-  factory QuestionId.fromQuestion({
-    required String questionId,
-    required String authId,
-  }) {
-    return QuestionId(
-      questionId: questionId,
-      authId: authId,
-      creAt: DateTime.now(),
-    );
-  }
-
   // fromFireatore
   factory QuestionId.fromFirestore(Map<String, dynamic> data) {
     return QuestionId(
