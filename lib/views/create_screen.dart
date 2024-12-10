@@ -58,7 +58,10 @@ class CreateScreen extends UserScreenBase {
         leading: CloseButton(style: IconButton.styleFrom(iconSize: 18)),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         actions: [
           Padding(

@@ -139,7 +139,7 @@ class SideWidget extends HookConsumerWidget {
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 60,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w500,
                                   fontFeatures: [FontFeature.tabularFigures()],
                                 ),
                               ),
@@ -182,7 +182,6 @@ class SideWidget extends HookConsumerWidget {
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 22,
-                              fontWeight: FontWeight.w400,
                               fontFeatures: const [
                                 FontFeature.tabularFigures()
                               ],

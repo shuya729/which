@@ -155,7 +155,7 @@ abstract class UserScreenBase extends ScreenBase {
               if (!indexes.hasPage(index)) {
                 return _nullWidget(refreshFunction, diff);
               } else if (indexes.showAd(index)) {
-                return WhichAdWidget(asyncMsg: asyncMsg);
+                return const WhichAdWidget();
               } else {
                 final int pageIndex = indexes.pageIndex(index);
                 final Question? question = questions[pageIndex];
@@ -211,10 +211,7 @@ abstract class UserScreenBase extends ScreenBase {
                             onPressed: () {
                               context.push(CreateScreen.absolutePath);
                             },
-                            label: const Text(
-                              '作成',
-                              style: TextStyle(fontFamily: "NotoSansJP"),
-                            ),
+                            label: const Text('作成'),
                             icon: const Icon(Icons.add),
                             style: ElevatedButton.styleFrom(
                               elevation: 2,
@@ -226,7 +223,10 @@ abstract class UserScreenBase extends ScreenBase {
                                 constraints.maxWidth * 0.3,
                                 constraints.maxHeight * 0.07,
                               ),
-                              textStyle: const TextStyle(fontSize: 18),
+                              textStyle: const TextStyle(
+                                fontSize: 18,
+                                fontFamily: 'NotoSansJP',
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),

@@ -174,6 +174,7 @@ class SigninScreen extends UserScreenBase {
                 textStyle: const TextStyle(
                   fontSize: 14,
                   decoration: TextDecoration.underline,
+                  fontFamily: 'NotoSansJP',
                 ),
               ),
               child: Text('$otherはこちら'),
