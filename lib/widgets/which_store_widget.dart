@@ -1,81 +1,95 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
-
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/link.dart';
 import 'package:which/models/color_set.dart';
 import 'package:which/utils/wave_clipper.dart';
 
-class WhichAdWidget extends HookConsumerWidget {
-  const WhichAdWidget({super.key});
+class WhichStoreWidget extends HookConsumerWidget {
+  const WhichStoreWidget({super.key});
 
   List<Widget> _appStoreChildren(BoxConstraints constraints) {
-    return [
+    final Uri appStoreUri =
+        Uri.parse('https://apps.apple.com/jp/app/bipick/id6737619772');
+
+    final List<Widget> list = [
       MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () {
-            html.window.open(
-              'https://apps.apple.com/jp/app/bipick/id6737619772',
-              'App Store',
+        child: Link(
+          uri: appStoreUri,
+          target: LinkTarget.blank,
+          builder: (context, followLink) {
+            return GestureDetector(
+              onTap: followLink,
+              child: Container(
+                width: constraints.maxWidth * 0.18,
+                constraints: BoxConstraints(
+                  minWidth: 120,
+                  maxWidth: 160,
+                ),
+                child: Image.asset(
+                  'assets/system/app_store.png',
+                ),
+              ),
             );
           },
-          child: Container(
-            width: constraints.maxWidth * 0.18,
-            constraints: BoxConstraints(
-              minWidth: 120,
-              maxWidth: 160,
-            ),
-            child: Image.asset(
-              'assets/system/app_store.png',
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(height: 5, width: 15),
-      Text(
-        'for iOS',
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 24,
         ),
       ),
     ];
+
+    if (constraints.maxHeight * 0.22 > 70) {
+      list.add(const SizedBox(height: 5, width: 15));
+      list.add(
+        const Text(
+          'for iOS',
+          style: TextStyle(color: Colors.white, fontSize: 24),
+        ),
+      );
+    }
+
+    return list;
   }
 
   List<Widget> _googlePlayChildren(BoxConstraints constraints) {
-    return [
+    final Uri googlePlayUri = Uri.parse(
+        'https://play.google.com/store/apps/details?id=com.which464.which');
+    final List<Widget> list = [
       MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () {
-            html.window.open(
-              'https://play.google.com/store/apps/details?id=com.which464.which',
-              'Google Play',
+        child: Link(
+          uri: googlePlayUri,
+          target: LinkTarget.blank,
+          builder: (context, followLink) {
+            return GestureDetector(
+              onTap: followLink,
+              child: Container(
+                width: constraints.maxWidth * 0.18,
+                constraints: BoxConstraints(
+                  minWidth: 120,
+                  maxWidth: 160,
+                ),
+                child: Image.asset(
+                  'assets/system/google_play.png',
+                ),
+              ),
             );
           },
-          child: Container(
-            width: constraints.maxWidth * 0.18,
-            constraints: BoxConstraints(
-              minWidth: 120,
-              maxWidth: 160,
-            ),
-            child: Image.asset(
-              'assets/system/google_play.png',
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(height: 5, width: 15),
-      Text(
-        'for Android',
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 24,
         ),
       ),
     ];
+
+    if (constraints.maxHeight * 0.22 > 70) {
+      list.add(const SizedBox(height: 5, width: 15));
+      list.add(
+        const Text(
+          'for Android',
+          style: TextStyle(color: Colors.white, fontSize: 24),
+        ),
+      );
+    }
+
+    return list;
   }
 
   @override
@@ -124,31 +138,6 @@ class WhichAdWidget extends HookConsumerWidget {
             builder: (context, constraints) {
               return Column(
                 children: [
-                  const Spacer(flex: 25),
-                  Container(
-                    height: constraints.maxHeight * 0.22,
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      width: constraints.maxWidth * 0.7,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.all(10),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        constraints: const BoxConstraints(maxWidth: 600),
-                      ),
-                    ),
-                  ),
-                  const Spacer(flex: 51),
-                ],
-              );
-            },
-          ),
-        ),
-        SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Column(
-                children: [
                   const Spacer(flex: 8),
                   Container(
                     height: constraints.maxHeight * 0.17,
@@ -174,9 +163,10 @@ class WhichAdWidget extends HookConsumerWidget {
                           maxWidth: 600,
                           minHeight: constraints.maxHeight * 0.1,
                         ),
-                        child: Text(
+                        child: AutoSizeText(
                           'BiPick のアプリをダウンロード',
                           textAlign: TextAlign.center,
+                          minFontSize: 10,
                           style: const TextStyle(fontSize: 26),
                         ),
                       ),

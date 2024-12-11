@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +15,7 @@ import 'package:which/views/create_screen.dart';
 import 'package:which/widgets/loading_widget.dart';
 import 'package:which/widgets/terms_dialog.dart';
 import 'package:which/widgets/which_ad_widget.dart';
+import 'package:which/widgets/which_store_widget.dart';
 import 'package:which/widgets/which_widget.dart';
 
 abstract class UserScreenBase extends ScreenBase {
@@ -155,7 +157,11 @@ abstract class UserScreenBase extends ScreenBase {
               if (!indexes.hasPage(index)) {
                 return _nullWidget(refreshFunction, diff);
               } else if (indexes.showAd(index)) {
-                return const WhichAdWidget();
+                if (kIsWeb) {
+                  return const WhichStoreWidget();
+                } else {
+                  return const WhichAdWidget();
+                }
               } else {
                 final int pageIndex = indexes.pageIndex(index);
                 final Question? question = questions[pageIndex];
