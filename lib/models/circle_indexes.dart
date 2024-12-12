@@ -70,7 +70,7 @@ class CircleIndexes extends Indexes {
 
   @override
   bool showAd(final int page) {
-    return page % loadCount == 18;
+    return page % (loadCount / 2) == 8;
   }
 
   @override
