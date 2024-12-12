@@ -267,7 +267,8 @@ abstract class UserScreenBase extends ScreenBase {
           IgnorePointer(
             ignoring: true,
             child: Container(
-              color: Colors.white.withOpacity((diff * 4).clamp(0, 0.6)),
+              color:
+                  Colors.white.withAlpha((diff * 1020).clamp(0, 153).toInt()),
             ),
           ),
           loading
