@@ -14,7 +14,6 @@ export const searchQuestions = onCall(
   {
     secrets: ["OPENAI_API_KEY"],
     region: "asia-northeast1",
-    enforceAppCheck: true,
   },
   async (request) => {
     const authId = request.auth?.uid;
