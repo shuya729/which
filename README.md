@@ -1,6 +1,6 @@
 # BiPick
 
-![BiPick Logo](./assets/images/bipick_splash_768.png)
+<img src="./assets/images/bipick_splash_1152.png" alt="BiPick Logo" width="300" />
 
 ## 概要
 
@@ -13,9 +13,7 @@
 
 といった幅広いテーマの 2 択質問が集まり、気になる質問に回答することで、他のユーザーがどちらを選んだのかリアルタイムで結果を確認できます。話題のきっかけにも最適です！
 
-誰でも簡単に質問を投稿し、多くの人から意見や反応を集めることができます。ちょっとした時間に楽しい議論や新しい発見を楽しみましょう！
-
-![BiPick Image](./assets/screenshots/future_graphic_1024x500.jpg)
+<img src="./assets/screenshots/future_graphic_1024x500.jpg" alt="BiPick Image" width="600" />
 
 ## インストール方法
 
