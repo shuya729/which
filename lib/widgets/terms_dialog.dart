@@ -32,12 +32,12 @@ class TermsDialog extends HookConsumerWidget {
       title: const Text(
         'ご利用前に',
         textAlign: TextAlign.center,
-        style: TextStyle(fontFamily: "NotoSansJP"),
       ),
       titleTextStyle: const TextStyle(
         color: Colors.black,
         fontSize: 18,
         fontWeight: FontWeight.w500,
+        fontFamily: 'NotoSansJP',
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,

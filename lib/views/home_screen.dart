@@ -116,6 +116,7 @@ class HomeScreen extends UserScreenBase {
     ValueNotifier<double> diff,
   ) {
     if (pageController.hasClients) {
+      FocusManager.instance.primaryFocus?.unfocus();
       final int page = pageController.page?.round() ?? 0;
       final double position = pageController.position.pixels / hieight;
       if (page == indexes.top) {
@@ -159,8 +160,8 @@ class HomeScreen extends UserScreenBase {
   ) {
     final QuestionsNotifier questionsNotifier =
         ref.read(questionsProvider.notifier);
-    final future =
-        useMemoized(() => questionsNotifier.initQuestions(id: id), [id]);
+    final future = useMemoized(
+        () => questionsNotifier.initQuestions(id: id), [id, myData.authId]);
     final AsyncSnapshot<void> asyncFuture = useFuture(future);
     if (asyncFuture.hasError) {
       return dispTemp(context: context, msg: 'データの取得に失敗しました。');

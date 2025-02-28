@@ -7,7 +7,6 @@ import { cacheQuestions } from "../utils/cache_questions";
 export const getQuestions = onCall(
   {
     region: "asia-northeast1",
-    enforceAppCheck: true,
   },
   async (request) => {
     const authId = request.auth?.uid;
