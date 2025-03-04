@@ -13,7 +13,7 @@ export const userCrawler = onSchedule(
   },
   async () => {
     const now = new Date();
-    const baseTime = 24 * 60 * 60 * 1000;
+    const baseTime = 7 * 24 * 60 * 60 * 1000;
     const baseStamp = Timestamp.fromMillis(now.getTime() - baseTime);
     const db = getFirestore();
     const auth = getAuth();
