@@ -9,6 +9,7 @@ import 'package:which/models/indexes.dart';
 import 'package:which/models/question.dart';
 import 'package:which/models/user_data.dart';
 import 'package:which/providers/config_provider.dart';
+import 'package:which/providers/user_reload_provider.dart';
 import 'package:which/providers/user_stream_provider.dart';
 import 'package:which/utils/screen_base.dart';
 import 'package:which/views/create_screen.dart';
@@ -81,22 +82,27 @@ abstract class UserScreenBase extends ScreenBase {
       } else if (remoteConfig.needUpdate(currentConfig.version)) {
         return dispTemp(context: context, msg: 'アプリを更新してください。');
       } else {
-        final AsyncValue<UserData> myData = ref.watch(userStreamProvider);
-        if (myData.hasError) {
-          return dispTemp(context: context, msg: '認証時にエラーが発生しました。');
-        } else if (myData.value == null) {
+        final AsyncValue<void> userReload = ref.watch(userReroadProvider);
+        if (userReload.isLoading) {
           return loadingTemp();
-        } else if (allowAnonymous == true && !myData.value!.anonymousFlg) {
-          return dispTemp(context: context, msg: '不正な画面遷移です。');
-        } else if (allowAnonymous == false && myData.value!.anonymousFlg) {
-          return dispTemp(context: context, msg: 'ログインが必要です。');
         } else {
-          useEffect(() {
-            _showTermsDialog(context, remoteConfig, currentConfig);
-            return null;
-          }, []);
-          return userBuild(
-              context, ref, myData.value!, loading, asyncPath, asyncMsg);
+          final AsyncValue<UserData> myData = ref.watch(userStreamProvider);
+          if (myData.hasError) {
+            return dispTemp(context: context, msg: '認証時にエラーが発生しました。');
+          } else if (myData.value == null) {
+            return loadingTemp();
+          } else if (allowAnonymous == true && !myData.value!.anonymousFlg) {
+            return dispTemp(context: context, msg: '不正な画面遷移です。');
+          } else if (allowAnonymous == false && myData.value!.anonymousFlg) {
+            return dispTemp(context: context, msg: 'ログインが必要です。');
+          } else {
+            useEffect(() {
+              _showTermsDialog(context, remoteConfig, currentConfig);
+              return null;
+            }, []);
+            return userBuild(
+                context, ref, myData.value!, loading, asyncPath, asyncMsg);
+          }
         }
       }
     }

@@ -11,7 +11,7 @@ final questionsProvider =
 class QuestionsNotifier extends StateNotifier<List<Question?>> {
   QuestionsNotifier(this.ref)
       : super(List<Question?>.filled(CircleIndexes.limit, null));
-  final StateNotifierProviderRef ref;
+  final Ref ref;
   final FunctionService _functionService = FunctionService();
 
   Future<List<Question?>> initQuestions({String? id}) async {

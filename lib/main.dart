@@ -1,10 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
@@ -33,10 +31,6 @@ class MyApp extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final GoRouter router = ref.watch(routerProvider);
-    useEffect(() {
-      FirebaseAuth.instance.currentUser?.getIdToken(true);
-      return null;
-    }, const []);
 
     return MaterialApp.router(
       // debugShowCheckedModeBanner: false, // サンプル用

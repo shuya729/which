@@ -8,7 +8,7 @@ final indexesProvider = StateNotifierProvider<IndexesNotifier, CircleIndexes>(
 
 class IndexesNotifier extends StateNotifier<CircleIndexes> {
   IndexesNotifier(this.ref) : super(const CircleIndexes());
-  final StateNotifierProviderRef ref;
+  final Ref ref;
 
   Future<void> changePage(int value) async {
     state = state.changePage(value);
