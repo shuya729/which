@@ -13,8 +13,10 @@ final StreamProvider<UserData> userStreamProvider = StreamProvider<UserData>(
   (ref) async* {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final AsyncValue<User?> asyncUser = ref.watch(_asyncUserProvider);
+    print('user: ${asyncUser.value?.uid}');
     if (asyncUser.hasError) {
-      throw asyncUser.error!;
+      await auth.signOut();
+      // throw asyncUser.error!;
     } else if (asyncUser.hasValue) {
       final User? user = asyncUser.value;
       if (user == null) {
