@@ -66,13 +66,13 @@ class Question {
       deletedFlg: data['deletedFlg'] as bool? ?? false,
       rejectedFlg: data['rejectedFlg'] as bool? ?? false,
       creAt: DateTime.fromMillisecondsSinceEpoch(
-        ((data['creAt'] as Map?)?['_seconds'] as int?) ?? 0 * 1000,
+        ((data['creAt'] as Map?)?['_seconds'] as num?)?.toInt() ?? 0 * 1000,
       ),
       updAt: DateTime.fromMillisecondsSinceEpoch(
-        ((data['updAt'] as Map?)?['_seconds'] as int?) ?? 0 * 1000,
+        ((data['updAt'] as Map?)?['_seconds'] as num?)?.toInt() ?? 0 * 1000,
       ),
       lastAt: DateTime.fromMillisecondsSinceEpoch(
-        ((data['creAt'] as Map?)?['_seconds'] as int?) ?? 0 * 1000,
+        ((data['creAt'] as Map?)?['_seconds'] as num?)?.toInt() ?? 0 * 1000,
       ),
     );
   }
