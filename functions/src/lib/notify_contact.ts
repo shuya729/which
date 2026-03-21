@@ -2,11 +2,14 @@ import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import * as https from "https";
 import { Contact } from "../models/contact";
 import { logger } from "firebase-functions/v2";
+import {
+  getLineChannelAccessToken,
+  getLinePushUserId,
+} from "../utils/env";
 
 export const notifyContact = onDocumentCreated(
   {
     document: "contacts/{contactId}",
-    secrets: ["LINE_CHANNEL_ACCESS_TOKEN"],
     region: "asia-northeast1",
   },
   async (event) => {
@@ -14,7 +17,7 @@ export const notifyContact = onDocumentCreated(
     if (!data) return;
     const contact: Contact = new Contact(data);
 
-    const userId = "U4a98564f54715db1129d0db57e423878";
+    const userId = getLinePushUserId();
     const post = {
       "to": userId,
       "messages": [
@@ -31,7 +34,7 @@ export const notifyContact = onDocumentCreated(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}`,
+        "Authorization": `Bearer ${getLineChannelAccessToken()}`,
       },
     };
     const req = https.request(url, options, (res) => {

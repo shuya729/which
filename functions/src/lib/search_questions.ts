@@ -9,10 +9,10 @@ import { getCounters } from "../utils/get_counters";
 import { Counter } from "../models/counter";
 import { logger } from "firebase-functions/v2";
 import { cacheQuestions } from "../utils/cache_questions";
+import { getOpenAIApiKey } from "../utils/env";
 
 export const searchQuestions = onCall(
   {
-    secrets: ["OPENAI_API_KEY"],
     region: "asia-northeast1",
   },
   async (request) => {
@@ -33,7 +33,7 @@ export const searchQuestions = onCall(
     const questionsCollection = db.collection("questions");
     const embeddingsCollection = db.collection("embeddings");
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: getOpenAIApiKey() });
     const embedding: number[] = await createEmbedding(openai, input);
 
     const embeddingIds: string[] = [];
