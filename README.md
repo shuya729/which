@@ -17,10 +17,6 @@
 
 ## インストール方法
 
-### Web 版
-
-[BiPick Web](https://bipick.net/)
-
 ### モバイルアプリ
 
 - **iOS 版**：[App Store](https://apps.apple.com/jp/app/bipick/id6737619772)
